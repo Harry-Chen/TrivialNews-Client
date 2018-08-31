@@ -3,6 +3,12 @@ package xyz.harrychen.trivialnews.support.api
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import com.google.gson.*
+import io.reactivex.Completable
+import io.reactivex.CompletableObserver
+import io.reactivex.Single
+import io.reactivex.SingleObserver
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -80,6 +86,19 @@ interface BaseApi {
                     .baseUrl(API_BASE_URL)
                     .client(httpClient)
             return builder.build()
+        }
+
+
+        fun observeCompletableApi(api: Completable, observer: CompletableObserver) {
+            api.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(observer)
+        }
+
+        fun <T> observeSingleSubscribableApi(api: Single<T>, observer: SingleObserver<T>) {
+            api.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(observer)
         }
 
 
