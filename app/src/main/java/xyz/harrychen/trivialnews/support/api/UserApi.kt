@@ -1,30 +1,24 @@
 package xyz.harrychen.trivialnews.support.api
 
 import io.reactivex.Completable
-import io.reactivex.CompletableObserver
 import io.reactivex.Single
-import io.reactivex.SingleObserver
-import retrofit2.http.DELETE
-import retrofit2.http.Field
-import retrofit2.http.POST
-import retrofit2.http.PUT
+import retrofit2.http.*
+import xyz.harrychen.trivialnews.models.QueryParameter
 import xyz.harrychen.trivialnews.models.Token
 
-interface UserApi : BaseApi {
+interface UserApi {
 
 
     @POST("/user/login")
-    fun loginOrRegister(@Field("username") username: String,
-                 @Field("password") password: String,
-                 @Field("register") register: Boolean = false): Single<Token>
+    fun loginOrRegister(@Body register: QueryParameter.Register): Single<Token>
 
 
     @PUT("/user/favorite")
-    fun addFavoriteNews(@Field("news_id") newsId: Int): Completable
+    fun addFavoriteNews(@Body newsId: QueryParameter.NewsId): Completable
 
 
     @DELETE("/user/favorite")
-    fun deleteFavoriteNews(@Field("news_id") newsId: Int): Completable
+    fun deleteFavoriteNews(@Body newsId: QueryParameter.NewsId): Completable
 
 
     companion object {
@@ -32,20 +26,24 @@ interface UserApi : BaseApi {
             return BaseApi.getRetrofit().create(UserApi::class.java)
         }
 
-        fun register(username: String, password: String, observer: SingleObserver<Token>) {
-            BaseApi.observeSingleSubscribableApi(create().loginOrRegister(username, password, true), observer)
+        fun register(username: String, password: String): Single<Token> {
+            return BaseApi.observeSingleSubscribableApi(create()
+                    .loginOrRegister(QueryParameter.Register(username, password, true)))
         }
 
-        fun login(username: String, password: String, observer: SingleObserver<Token>) {
-            BaseApi.observeSingleSubscribableApi(create().loginOrRegister(username, password), observer)
+        fun login(username: String, password: String): Single<Token> {
+            return BaseApi.observeSingleSubscribableApi(create()
+                    .loginOrRegister(QueryParameter.Register(username, password)))
         }
 
-        fun addFavoriteNews(newsId: Int, observer: CompletableObserver) {
-            BaseApi.observeCompletableApi(create().addFavoriteNews(newsId), observer)
+        fun addFavoriteNews(newsId: Int): Completable {
+            return BaseApi.observeCompletableApi(create()
+                    .addFavoriteNews(QueryParameter.NewsId(newsId)))
         }
 
-        fun deleteFavoriteNews(newsId: Int, observer: CompletableObserver) {
-            BaseApi.observeCompletableApi(create().deleteFavoriteNews(newsId), observer)
+        fun deleteFavoriteNews(newsId: Int): Completable {
+            return BaseApi.observeCompletableApi(create()
+                    .deleteFavoriteNews(QueryParameter.NewsId(newsId)))
         }
 
     }

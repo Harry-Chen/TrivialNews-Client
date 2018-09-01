@@ -30,7 +30,7 @@ interface BaseApi {
                 val response = chain.proceed(request)
                 val body = response.body()!!.string()
 
-                val json = Parser().parse(body) as JsonObject
+                val json = Parser().parse(StringBuilder(body)) as JsonObject
 
                 val errorCode = json.int("error_code")!!
                 if (response.code() == 200 && errorCode == 0) {
@@ -68,12 +68,12 @@ interface BaseApi {
         private val GSON by lazy {
             GsonBuilder()
                     .registerTypeAdapter(DateTime::class.java,
-                            { json: JsonElement?, _: Type?, _: JsonDeserializationContext? ->
+                            JsonDeserializer<DateTime> { json: JsonElement?, _: Type?, _: JsonDeserializationContext? ->
                                 val dateString = json!!.asString
                                 ISODateTimeFormat.dateTimeParser().parseDateTime(dateString)
                             })
                     .registerTypeAdapter(DateTime::class.java,
-                            { src: DateTime?, _: Type?, _: JsonSerializationContext? ->
+                            JsonSerializer<DateTime> { src: DateTime?, _: Type?, _: JsonSerializationContext? ->
                                 JsonPrimitive(ISODateTimeFormat.dateTime().print(src))
                             })
                     .create()
@@ -89,22 +89,20 @@ interface BaseApi {
         }
 
 
-        fun observeCompletableApi(api: Completable, observer: CompletableObserver) {
-            api.subscribeOn(Schedulers.io())
+        fun observeCompletableApi(api: Completable): Completable {
+            return api.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(observer)
         }
 
-        fun <T> observeSingleSubscribableApi(api: Single<T>, observer: SingleObserver<T>) {
-            api.subscribeOn(Schedulers.io())
+        fun <T> observeSingleSubscribableApi(api: Single<T>): Single<T> {
+            return api.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(observer)
         }
 
 
         fun getRetrofit(): Retrofit {
             if (RETROFIT == null) {
-                RETROFIT = getRetrofit()
+                RETROFIT = buildRetrofit()
             }
             return RETROFIT!!
         }

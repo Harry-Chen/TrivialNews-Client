@@ -1,20 +1,19 @@
 package xyz.harrychen.trivialnews.support.api
 
 import io.reactivex.Completable
-import io.reactivex.CompletableObserver
+import retrofit2.http.Body
 import retrofit2.http.DELETE
-import retrofit2.http.Field
 import retrofit2.http.POST
+import xyz.harrychen.trivialnews.models.QueryParameter
 
-interface CommentApi: BaseApi {
+interface CommentApi {
 
     @POST("/comment")
-    fun addComment(@Field("news_id") newsId: Int,
-                   @Field("content") content: String): Completable
+    fun addComment(@Body addComment: QueryParameter.AddComment): Completable
 
 
     @DELETE("/comment")
-    fun deleteComment(@Field("news_id") newsId: Int): Completable
+    fun deleteComment(@Body commentId: QueryParameter.CommentId): Completable
 
 
     companion object {
@@ -22,12 +21,14 @@ interface CommentApi: BaseApi {
             return BaseApi.getRetrofit().create(CommentApi::class.java)
         }
 
-        fun addComment(newsId: Int, content: String, observer: CompletableObserver) {
-            BaseApi.observeCompletableApi(create().addComment(newsId, content), observer)
+        fun addComment(newsId: Int, content: String): Completable {
+            return BaseApi.observeCompletableApi(create()
+                    .addComment(QueryParameter.AddComment(newsId, content)))
         }
 
-        fun deleteComment(newsId: Int, observer: CompletableObserver) {
-            BaseApi.observeCompletableApi(create().deleteComment(newsId), observer)
+        fun deleteComment(commentId: Int): Completable {
+            return BaseApi.observeCompletableApi(create()
+                    .deleteComment(QueryParameter.CommentId(commentId)))
         }
     }
 }
