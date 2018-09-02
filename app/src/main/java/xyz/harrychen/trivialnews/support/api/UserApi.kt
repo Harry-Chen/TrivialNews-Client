@@ -26,14 +26,10 @@ interface UserApi {
             return BaseApi.getRetrofit().create(UserApi::class.java)
         }
 
-        fun register(username: String, password: String): Single<Token> {
-            return BaseApi.observeSingleSubscribableApi(create()
-                    .loginOrRegister(QueryParameter.Register(username, password, true)))
-        }
 
-        fun login(username: String, password: String): Single<Token> {
+        fun loginOrRegister(parameter: QueryParameter.Register): Single<Token> {
             return BaseApi.observeSingleSubscribableApi(create()
-                    .loginOrRegister(QueryParameter.Register(username, password)))
+                    .loginOrRegister(parameter))
         }
 
         fun addFavoriteNews(newsId: Int): Completable {

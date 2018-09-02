@@ -1,8 +1,8 @@
 package xyz.harrychen.trivialnews.models
 
 import com.google.gson.annotations.SerializedName
-import org.joda.time.DateTime
 import xyz.harrychen.trivialnews.support.NEWS_PER_LOAD
+import java.util.*
 
 object QueryParameter {
     data class NewsId(
@@ -31,8 +31,8 @@ object QueryParameter {
     data class Timeline(
             val type: String,
             @SerializedName("channel_id") val channelId: Int? = null,
-            @SerializedName("before_time") val beforeTime: DateTime? = null,
-            @SerializedName("after_time") val afterTime: DateTime? = null,
+            @SerializedName("before_time") val beforeTime: Date? = null,
+            @SerializedName("after_time") val afterTime: Date? = null,
             val query: String? = null,
             val page: Int,
             val count: Int = NEWS_PER_LOAD

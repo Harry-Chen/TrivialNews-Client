@@ -1,10 +1,17 @@
 package xyz.harrychen.trivialnews.models
 
 import com.google.gson.annotations.SerializedName
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 
-data class Channel(
-        @SerializedName("_id") val id: Int,
-        val name: String,
-        val description: String,
-        val subscribed: Boolean
-);
+open class Channel(
+        @PrimaryKey
+        @SerializedName("_id")
+        var id: Int = 0,
+
+        var name: String = "",
+
+        var description: String = "",
+
+        var subscribed: Boolean = false
+): RealmObject()

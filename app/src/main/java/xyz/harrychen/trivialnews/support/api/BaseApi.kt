@@ -1,18 +1,19 @@
 package xyz.harrychen.trivialnews.support.api
 
+import com.beust.klaxon.JsonBase
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import com.google.gson.*
 import io.reactivex.Completable
-import io.reactivex.CompletableObserver
 import io.reactivex.Single
-import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import io.realm.RealmObject
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
-import org.joda.time.DateTime
+import org.joda.time.LocalDate
+import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -20,6 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import xyz.harrychen.trivialnews.support.API_BASE_URL
 import xyz.harrychen.trivialnews.support.utils.ApiException
 import java.lang.reflect.Type
+import java.util.*
 
 interface BaseApi {
     companion object {
@@ -34,7 +36,8 @@ interface BaseApi {
 
                 val errorCode = json.int("error_code")!!
                 if (response.code() == 200 && errorCode == 0) {
-                    val newBodyString = json.obj("result")!!.toJsonString()
+                    val result = json["result"] as JsonBase
+                    val newBodyString = result.toJsonString()
                     val newResponse = ResponseBody.create(response.body()!!.contentType(), newBodyString)
                     response.newBuilder().body(newResponse).build()
 
@@ -65,16 +68,34 @@ interface BaseApi {
 
         private var RETROFIT: Retrofit? = null
 
+        val dateTimeFormatter: DateTimeFormatter by lazy {
+            ISODateTimeFormat.dateTime()
+        }
+
+        val dateTimePrinter: DateTimeFormatter by lazy {
+            ISODateTimeFormat.dateTimeParser()
+        }
+
         private val GSON by lazy {
             GsonBuilder()
-                    .registerTypeAdapter(DateTime::class.java,
-                            JsonDeserializer<DateTime> { json: JsonElement?, _: Type?, _: JsonDeserializationContext? ->
+                    .setExclusionStrategies(object:ExclusionStrategy{
+                        override fun shouldSkipClass(clazz: Class<*>?): Boolean {
+                            return false
+                        }
+
+                        override fun shouldSkipField(f: FieldAttributes?): Boolean {
+                            return f?.declaredClass == RealmObject::class.java
+                        }
+                    })
+                    .registerTypeAdapter(Date::class.java,
+                            JsonDeserializer<Date> { json: JsonElement?, _: Type?, _: JsonDeserializationContext? ->
                                 val dateString = json!!.asString
-                                ISODateTimeFormat.dateTimeParser().parseDateTime(dateString)
+                                val datetime = dateTimePrinter.parseDateTime(dateString)
+                                datetime.toLocalDate().toDate()
                             })
-                    .registerTypeAdapter(DateTime::class.java,
-                            JsonSerializer<DateTime> { src: DateTime?, _: Type?, _: JsonSerializationContext? ->
-                                JsonPrimitive(ISODateTimeFormat.dateTime().print(src))
+                    .registerTypeAdapter(Date::class.java,
+                            JsonSerializer<Date> { src: Date?, _: Type?, _: JsonSerializationContext? ->
+                                JsonPrimitive(dateTimeFormatter.print(LocalDate(src)))
                             })
                     .create()
         }
