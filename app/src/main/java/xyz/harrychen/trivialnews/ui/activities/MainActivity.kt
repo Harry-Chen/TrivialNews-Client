@@ -6,13 +6,8 @@ import android.support.v7.app.AppCompatActivity
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.error
-import org.jetbrains.anko.toast
-import org.joda.time.LocalDateTime
 import xyz.harrychen.trivialnews.R
-import xyz.harrychen.trivialnews.support.api.BaseApi
-import xyz.harrychen.trivialnews.support.api.NewsApi
-import xyz.harrychen.trivialnews.support.api.UserApi
+import xyz.harrychen.trivialnews.ui.fragments.BaseTimeLineFragment
 
 class MainActivity : AppCompatActivity(), AnkoLogger {
 
@@ -40,16 +35,11 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        setSupportActionBar(main_toolbar)
 
-        NewsApi.getTimeline(0).subscribe({
-            newsList ->
-            newsList.forEach{
-                message.text = message.text.toString() + "\n" + BaseApi.dateTimeFormatter.print(LocalDateTime(it.publishDate)) + "\n" + it.title
-            }
-        },{ e ->
-                throw(e)
-        })
+        main_navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+
+        supportFragmentManager.beginTransaction().replace(R.id.main_frame, BaseTimeLineFragment()).commit()
 
     }
 }

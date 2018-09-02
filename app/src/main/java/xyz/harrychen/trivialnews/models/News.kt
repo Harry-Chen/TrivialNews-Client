@@ -16,7 +16,7 @@ open class News(
         @SerializedName("comment_num")
         var commentNum: Int = 0,
         @SerializedName("like_num")
-        var LikeNum: Int = 0,
+        var likeNum: Int = 0,
         var author: String = "",
         @SerializedName("pubdate")
         var publishDate: Date = Date(),

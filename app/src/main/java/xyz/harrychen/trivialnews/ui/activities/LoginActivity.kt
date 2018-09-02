@@ -1,10 +1,11 @@
 package xyz.harrychen.trivialnews.ui.activities
 
+import android.arch.lifecycle.Lifecycle
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
-import com.trello.rxlifecycle2.android.lifecycle.kotlin.bindToLifecycle
+import com.trello.rxlifecycle2.android.lifecycle.kotlin.bindUntilEvent
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.realm.Realm
@@ -24,8 +25,14 @@ class LoginActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        realm = Realm.getInstance(RealmHelper.CONFIG_TOKEN)
         checkToken()
+        setTitle(R.string.login_register_title)
         setContentView(R.layout.activity_login)
+    }
+
+    override fun onStart() {
+        super.onStart()
         initForm()
     }
 
@@ -35,7 +42,6 @@ class LoginActivity: AppCompatActivity() {
     }
 
     private fun checkToken() {
-        realm = Realm.getInstance(RealmHelper.CONFIG_TOKEN)
         val token = realm.where(Token::class.java).equalTo("id", 0 as Int).findFirst()
         if (token != null) {
             toast(R.string.auto_logged_in)
@@ -62,15 +68,15 @@ class LoginActivity: AppCompatActivity() {
                     val usernameValid = !username.isBlank() && !username.contains(Regex("\\s+"))
                     val passwordValid = !password.isBlank() && !password.contains(Regex("\\s+"))
                     usernameValid && passwordValid
-                }).bindToLifecycle(this)
+                }).bindUntilEvent(this, Lifecycle.Event.ON_STOP)
         inputChecker.subscribe(setButtonState)
 
-        btn_register.clicks().bindToLifecycle(this).subscribe{
+        btn_register.clicks().bindUntilEvent(this, Lifecycle.Event.ON_STOP).subscribe{
             setButtonState(false)
             loginOrRegister(QueryParameter.Register(input_username.text.toString(), input_password.text.toString(), true))
         }
 
-        btn_login.clicks().bindToLifecycle(this).subscribe{
+        btn_login.clicks().bindUntilEvent(this, Lifecycle.Event.ON_STOP).subscribe{
             setButtonState(false)
             loginOrRegister(QueryParameter.Register(input_username.text.toString(), input_password.text.toString(), false))
         }
@@ -86,6 +92,7 @@ class LoginActivity: AppCompatActivity() {
             setTokenAndStartMain(token.token)
         }, { error ->
             toast("${getString(R.string.login_register_failed)} ${error.message}")
+            setButtonState(true)
         })
     }
 }
