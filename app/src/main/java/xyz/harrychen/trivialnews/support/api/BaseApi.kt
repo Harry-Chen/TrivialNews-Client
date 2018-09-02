@@ -12,7 +12,7 @@ import io.realm.RealmObject
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
-import org.joda.time.LocalDate
+import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 import retrofit2.Retrofit
@@ -72,7 +72,7 @@ interface BaseApi {
             ISODateTimeFormat.dateTime()
         }
 
-        val dateTimePrinter: DateTimeFormatter by lazy {
+        val dateTimeParser: DateTimeFormatter by lazy {
             ISODateTimeFormat.dateTimeParser()
         }
 
@@ -90,12 +90,12 @@ interface BaseApi {
                     .registerTypeAdapter(Date::class.java,
                             JsonDeserializer<Date> { json: JsonElement?, _: Type?, _: JsonDeserializationContext? ->
                                 val dateString = json!!.asString
-                                val datetime = dateTimePrinter.parseDateTime(dateString)
-                                datetime.toLocalDate().toDate()
+                                val datetime = dateTimeParser.parseDateTime(dateString)
+                                datetime.toLocalDateTime().toDate()
                             })
                     .registerTypeAdapter(Date::class.java,
                             JsonSerializer<Date> { src: Date?, _: Type?, _: JsonSerializationContext? ->
-                                JsonPrimitive(dateTimeFormatter.print(LocalDate(src)))
+                                JsonPrimitive(dateTimeFormatter.print(LocalDateTime(src)))
                             })
                     .create()
         }

@@ -8,6 +8,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.error
 import org.jetbrains.anko.toast
+import org.joda.time.LocalDateTime
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.support.api.BaseApi
 import xyz.harrychen.trivialnews.support.api.NewsApi
@@ -44,7 +45,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         NewsApi.getTimeline(0).subscribe({
             newsList ->
             newsList.forEach{
-                message.text = message.text.toString() + "\n" + it.title
+                message.text = message.text.toString() + "\n" + BaseApi.dateTimeFormatter.print(LocalDateTime(it.publishDate)) + "\n" + it.title
             }
         },{ e ->
                 throw(e)

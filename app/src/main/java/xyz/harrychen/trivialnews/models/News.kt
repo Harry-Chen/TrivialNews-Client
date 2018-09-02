@@ -18,6 +18,7 @@ open class News(
         @SerializedName("like_num")
         var LikeNum: Int = 0,
         var author: String = "",
+        @SerializedName("pubdate")
         var publishDate: Date = Date(),
         var link: String = "",
         var picture: String = ""
