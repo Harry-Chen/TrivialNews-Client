@@ -68,6 +68,8 @@ dependencies {
 
     implementation 'me.zhanghai.android.materialprogressbar:library:1.4.2'
 
+    implementation 'com.miguelcatalan:materialsearchview:1.4.0'
+
 
     kapt 'com.github.bumptech.glide:compiler:4.7.1'
     kapt "android.arch.lifecycle:compiler:$lifecycle_version"

@@ -54,12 +54,12 @@ interface NewsApi {
             ))
         }
 
-        fun searchNews(query: String, afterTime: DateTime, beforeTime: DateTime, page: Int)
+        fun searchNews(query: String, afterTime: DateTime?, beforeTime: DateTime?, page: Int)
                 : Single<List<News>> {
             return BaseApi.observeSingleSubscribableApi(create().getNewsTimeline(
                     type = "search", page = page, query = query,
-                    afterTime = BaseApi.dateTimeFormatter.print(afterTime),
-                    beforeTime = BaseApi.dateTimeFormatter.print(beforeTime)
+                    afterTime = afterTime?.let(BaseApi.dateTimeFormatter::print),
+                    beforeTime = beforeTime?.let(BaseApi.dateTimeFormatter::print)
             ))
         }
 

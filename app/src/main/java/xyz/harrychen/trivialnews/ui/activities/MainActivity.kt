@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.support.design.internal.BottomNavigationItemView
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.view.menu.ActionMenuItemView
+import android.view.Menu
+import com.miguelcatalan.materialsearchview.MaterialSearchView
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.startActivity
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.ui.fragments.BaseTimeLineFragment
 import xyz.harrychen.trivialnews.ui.fragments.FavoriteFragment
@@ -18,6 +20,11 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
     private var nowFragmentId = -1
     private var fragments: HashMap<Int, BaseTimeLineFragment> = HashMap()
+
+    private fun initNavigation() {
+        main_navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        findViewById<BottomNavigationItemView>(R.id.navigation_timeline).callOnClick()
+    }
 
     private val createFragment = { id: Int ->
         when (id) {
@@ -59,11 +66,36 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
         setSupportActionBar(main_toolbar)
 
-        main_navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        initNavigation()
+        initSearch()
 
+    }
 
-        findViewById<BottomNavigationItemView>(R.id.navigation_timeline).callOnClick()
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_search, menu)
+        val item = menu.findItem(R.id.action_search)
+        main_search.setMenuItem(item)
+        return true
+    }
 
+    override fun onBackPressed() {
+        when (main_search.isSearchOpen) {
+            true -> main_search.closeSearch()
+            false -> super.onBackPressed()
+        }
+    }
+
+    private fun initSearch() {
+        main_search.setOnQueryTextListener(object:MaterialSearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                startActivity<SearchResultActivity>("query" to query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+        })
     }
 
 }

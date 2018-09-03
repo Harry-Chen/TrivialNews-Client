@@ -32,6 +32,7 @@ abstract class BaseTimeLineFragment : Fragment(), AnkoLogger {
 
     protected var realmConfig: RealmConfiguration? = null
     protected var infiniteScroll = true
+    protected var canRefresh = true
 
     private lateinit var newsListView: View
     private lateinit var timelineAdapter: BaseTimeLineAdapter
@@ -138,6 +139,7 @@ abstract class BaseTimeLineFragment : Fragment(), AnkoLogger {
 
     private fun setupRefresher() {
         with(newsListView.swipe_refresh) {
+            isEnabled = canRefresh
             setColorSchemeColors(
                     ContextCompat.getColor(context!!, R.color.colorPrimary),
                     ContextCompat.getColor(context!!, R.color.colorAccent))

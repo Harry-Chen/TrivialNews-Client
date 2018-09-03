@@ -15,4 +15,6 @@
     <string name="no_more">没有更多内容了</string>
     <string name="refresh_failed">刷新失败</string>
     <string name="load_more_failed">加载更多内容失败</string>
+    <string name="menu_search">搜索</string>
+    <string name="search_result_title">"%s" 的搜索结果</string>
 </resources>
