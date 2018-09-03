@@ -14,7 +14,7 @@ import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.QueryParameter
-import xyz.harrychen.trivialnews.models.Token
+import xyz.harrychen.trivialnews.models.User
 import xyz.harrychen.trivialnews.support.api.BaseApi
 import xyz.harrychen.trivialnews.support.api.UserApi
 import xyz.harrychen.trivialnews.support.utils.RealmHelper
@@ -25,7 +25,7 @@ class LoginActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        realm = Realm.getInstance(RealmHelper.CONFIG_TOKEN)
+        realm = Realm.getInstance(RealmHelper.CONFIG_USER)
         checkToken()
         setTitle(R.string.login_register_title)
         setContentView(R.layout.activity_login)
@@ -42,7 +42,7 @@ class LoginActivity: AppCompatActivity() {
     }
 
     private fun checkToken() {
-        val token = realm.where(Token::class.java).equalTo("id", 0 as Int).findFirst()
+        val token = realm.where(User::class.java).equalTo("id", 0 as Int).findFirst()
         if (token != null) {
             toast(R.string.auto_logged_in)
             setTokenAndStartMain(token.token)
@@ -73,12 +73,14 @@ class LoginActivity: AppCompatActivity() {
 
         btn_register.clicks().bindUntilEvent(this, Lifecycle.Event.ON_STOP).subscribe{
             setButtonState(false)
-            loginOrRegister(QueryParameter.Register(input_username.text.toString(), input_password.text.toString(), true))
+            loginOrRegister(QueryParameter.Register(input_username.text.toString(),
+                    input_password.text.toString(), true))
         }
 
         btn_login.clicks().bindUntilEvent(this, Lifecycle.Event.ON_STOP).subscribe{
             setButtonState(false)
-            loginOrRegister(QueryParameter.Register(input_username.text.toString(), input_password.text.toString(), false))
+            loginOrRegister(QueryParameter.Register(input_username.text.toString(),
+                    input_password.text.toString(), false))
         }
 
     }
@@ -86,7 +88,7 @@ class LoginActivity: AppCompatActivity() {
     private fun loginOrRegister(parameter: QueryParameter.Register) {
         UserApi.loginOrRegister(parameter).subscribe({token ->
             realm.beginTransaction()
-            realm.copyToRealm(Token(token=token.token))
+            realm.copyToRealm(User(username=input_username.text.toString(), token=token.token))
             realm.commitTransaction()
             toast("${getString(R.string.login_register_success)} ${parameter.username}")
             setTokenAndStartMain(token.token)

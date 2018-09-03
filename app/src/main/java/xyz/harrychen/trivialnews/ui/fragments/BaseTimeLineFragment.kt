@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.LinearSmoothScroller
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,11 +26,12 @@ import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.support.adapter.BaseTimeLineAdapter
 
-abstract class BaseTimeLineFragment: Fragment(), AnkoLogger {
+abstract class BaseTimeLineFragment : Fragment(), AnkoLogger {
 
     private var currentPage = 0
 
     protected var realmConfig: RealmConfiguration? = null
+    protected var infiniteScroll = true
 
     private lateinit var newsListView: View
     private lateinit var timelineAdapter: BaseTimeLineAdapter
@@ -39,7 +41,7 @@ abstract class BaseTimeLineFragment: Fragment(), AnkoLogger {
         newsListView = inflater.inflate(R.layout.refreshable_timeline, container, false)
         timelineAdapter = BaseTimeLineAdapter()
 
-        with (newsListView.timeline_list) {
+        with(newsListView.timeline_list) {
             itemAnimator = LandingAnimator()
             layoutManager = LinearLayoutManager(this.context)
             adapter = ScaleInAnimationAdapter(timelineAdapter)
@@ -51,6 +53,23 @@ abstract class BaseTimeLineFragment: Fragment(), AnkoLogger {
         refreshTimeLine()
 
         return newsListView
+    }
+
+
+    fun scrollAndRefresh() {
+        with(newsListView.timeline_list.layoutManager!! as LinearLayoutManager) {
+            if (itemCount > 0 && findFirstCompletelyVisibleItemPosition() != 0) {
+                val scroller = object : LinearSmoothScroller(context) {
+                    override fun getVerticalSnapPreference(): Int {
+                        return LinearSmoothScroller.SNAP_TO_START
+                    }
+                }
+                scroller.targetPosition = 0
+                startSmoothScroll(scroller)
+            } else {
+                refreshTimeLine()
+            }
+        }
     }
 
     abstract fun loadFromNetwork(page: Int = 0): Single<List<News>>
@@ -102,19 +121,19 @@ abstract class BaseTimeLineFragment: Fragment(), AnkoLogger {
 
     private var isLoading: Boolean = false
         set(loading) {
-        field = loading
-        with (newsListView) {
-            val animator = timeline_footer.animate()
-            when(loading) {
-                true -> animator.alpha(1.0f)
-                false -> animator.alpha(0.0f)
+            field = loading
+            with(newsListView) {
+                val animator = timeline_footer.animate()
+                when (loading) {
+                    true -> animator.alpha(1.0f)
+                    false -> animator.alpha(0.0f)
+                }
+                animator.setDuration(300)
+                        .setInterpolator(AccelerateDecelerateInterpolator())
+                        .start()
+                invalidate()
             }
-            animator.setDuration(300)
-                    .setInterpolator(AccelerateDecelerateInterpolator())
-                    .start()
-            invalidate()
         }
-    }
 
 
     private fun setupRefresher() {
@@ -129,11 +148,11 @@ abstract class BaseTimeLineFragment: Fragment(), AnkoLogger {
     }
 
     private fun setupLoadMore() {
-        with (newsListView) {
+        with(newsListView) {
             timeline_footer.alpha = 0.0f
             timeline_list.scrollEvents()
                     .bindUntilEvent(this@BaseTimeLineFragment, Lifecycle.Event.ON_DESTROY)
-                    .subscribe{ event ->
+                    .subscribe { event ->
                         val manager = event.view().layoutManager as LinearLayoutManager
                         var lastItem = manager.findLastCompletelyVisibleItemPosition()
                         if (lastItem == -1) lastItem = manager.findLastVisibleItemPosition()
@@ -142,6 +161,7 @@ abstract class BaseTimeLineFragment: Fragment(), AnkoLogger {
                                 && lastItem == manager.itemCount - 1
                                 && event.dy() > 0
                                 && !fromCache
+                                && infiniteScroll
                         ) {
                             isLoading = true
                             loadMore()

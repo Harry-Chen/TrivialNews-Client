@@ -4,13 +4,13 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.http.*
 import xyz.harrychen.trivialnews.models.QueryParameter
-import xyz.harrychen.trivialnews.models.Token
+import xyz.harrychen.trivialnews.models.User
 
 interface UserApi {
 
 
     @POST("/user/login")
-    fun loginOrRegister(@Body register: QueryParameter.Register): Single<Token>
+    fun loginOrRegister(@Body register: QueryParameter.Register): Single<User>
 
 
     @PUT("/user/favorite")
@@ -27,7 +27,7 @@ interface UserApi {
         }
 
 
-        fun loginOrRegister(parameter: QueryParameter.Register): Single<Token> {
+        fun loginOrRegister(parameter: QueryParameter.Register): Single<User> {
             return BaseApi.observeSingleSubscribableApi(create()
                     .loginOrRegister(parameter))
         }

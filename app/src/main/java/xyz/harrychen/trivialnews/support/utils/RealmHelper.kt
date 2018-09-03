@@ -5,7 +5,7 @@ import io.realm.annotations.RealmModule
 import xyz.harrychen.trivialnews.models.Category
 import xyz.harrychen.trivialnews.models.Channel
 import xyz.harrychen.trivialnews.models.News
-import xyz.harrychen.trivialnews.models.Token
+import xyz.harrychen.trivialnews.models.User
 
 class RealmHelper{
 
@@ -15,14 +15,14 @@ class RealmHelper{
     @RealmModule(classes = [Category::class, Channel::class])
     private class ChannelModel
 
-    @RealmModule(classes = [Token::class])
-    private class TokenModel
+    @RealmModule(classes = [User::class])
+    private class UserModel
 
     companion object {
-        val CONFIG_TOKEN by lazy {
+        val CONFIG_USER by lazy {
             RealmConfiguration.Builder()
-                    .name("token.realm")
-                    .modules(TokenModel())
+                    .name("user.realm")
+                    .modules(UserModel())
                     .schemaVersion(1)
                     .deleteRealmIfMigrationNeeded()
                     .build()
