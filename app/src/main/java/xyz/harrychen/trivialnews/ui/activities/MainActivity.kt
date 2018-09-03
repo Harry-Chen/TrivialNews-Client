@@ -6,20 +6,19 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import com.miguelcatalan.materialsearchview.MaterialSearchView
-import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.startActivity
 import xyz.harrychen.trivialnews.R
-import xyz.harrychen.trivialnews.ui.fragments.BaseTimeLineFragment
+import xyz.harrychen.trivialnews.ui.fragments.BaseTimelineFragment
 import xyz.harrychen.trivialnews.ui.fragments.FavoriteFragment
-import xyz.harrychen.trivialnews.ui.fragments.MainTimeLineFragment
+import xyz.harrychen.trivialnews.ui.fragments.MainTimelineFragment
 import xyz.harrychen.trivialnews.ui.fragments.RecommendFragment
 
 class MainActivity : AppCompatActivity(), AnkoLogger {
 
     private var nowFragmentId = -1
-    private var fragments: HashMap<Int, BaseTimeLineFragment> = HashMap()
+    private var fragments: HashMap<Int, BaseTimelineFragment> = HashMap()
 
     private fun initNavigation() {
         main_navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
@@ -30,7 +29,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         when (id) {
             R.id.navigation_timeline -> {
                 // message.setText(R.string.title_home)
-                MainTimeLineFragment()
+                MainTimelineFragment()
             }
             R.id.navigation_favorite -> {
                 // message.setText(R.string.title_dashboard)
@@ -67,14 +66,16 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         setSupportActionBar(main_toolbar)
 
         initNavigation()
-        initSearch()
+        initToolbarAction()
 
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_search, menu)
-        val item = menu.findItem(R.id.action_search)
-        main_search.setMenuItem(item)
+        menuInflater.inflate(R.menu.main_toolbar, menu)
+        main_search.setMenuItem(menu.findItem(R.id.action_search))
+        menu.findItem(R.id.action_range).setOnMenuItemClickListener {
+            showDateChooserDialog()
+            true }
         return true
     }
 
@@ -85,10 +86,14 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         }
     }
 
-    private fun initSearch() {
+    private fun showDateChooserDialog() {
+
+    }
+
+    private fun initToolbarAction() {
         main_search.setOnQueryTextListener(object:MaterialSearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
-                startActivity<SearchResultActivity>("query" to query)
+                startActivity<FilteredResultActivity>("query" to query)
                 return true
             }
 
@@ -96,6 +101,8 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
                 return false
             }
         })
+
+
     }
 
 }

@@ -8,19 +8,23 @@ import io.reactivex.Single
 import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.support.api.NewsApi
 
-class SearchResultFragment : BaseTimelineFragment() {
+class RangeTimelineFragment: BaseTimelineFragment() {
 
     init {
         canRefresh = false
     }
 
-    private lateinit var query: String
+    private lateinit var beforeTime: String
+    private lateinit var afterTime: String
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        query = arguments!!["query"] as String
+        beforeTime = arguments!!["beforeTime"] as String
+        afterTime = arguments!!["afterTime"] as String
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    override fun loadFromNetwork(page: Int): Single<List<News>> = NewsApi.searchNews(query, page)
+    override fun loadFromNetwork(page: Int): Single<List<News>> {
+        return NewsApi.getRangeTimeline(afterTime, beforeTime, page)
+    }
 
 }

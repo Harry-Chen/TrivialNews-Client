@@ -5,7 +5,7 @@ import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.support.api.NewsApi
 import xyz.harrychen.trivialnews.support.utils.RealmHelper
 
-class FavoriteFragment: BaseTimeLineFragment() {
+class FavoriteFragment: BaseTimelineFragment() {
 
     init {
         realmConfig = RealmHelper.CONFIG_NEWS_FAVIROTE

@@ -1,7 +1,6 @@
 package xyz.harrychen.trivialnews.support.api
 
 import io.reactivex.Single
-import org.joda.time.DateTime
 import retrofit2.http.*
 import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.models.NewsDetail
@@ -36,9 +35,17 @@ interface NewsApi {
             ))
         }
 
+        fun getRangeTimeline(afterTime: String, beforeTime: String, page: Int):
+                Single<List<News>> {
+            return BaseApi.observeSingleSubscribableApi(create().getNewsTimeline(
+                    type = "timeline", page = page,
+                    afterTime = afterTime, beforeTime = beforeTime
+            ))
+        }
+
         fun getChannelContent(channelId: Int, page: Int): Single<List<News>> {
             return BaseApi.observeSingleSubscribableApi(create().getNewsTimeline(
-                    type = "timeline", page = page, channelId = channelId
+                    type = "channel", page = page, channelId = channelId
             ))
         }
 
@@ -54,12 +61,10 @@ interface NewsApi {
             ))
         }
 
-        fun searchNews(query: String, afterTime: DateTime?, beforeTime: DateTime?, page: Int)
+        fun searchNews(query: String, page: Int)
                 : Single<List<News>> {
             return BaseApi.observeSingleSubscribableApi(create().getNewsTimeline(
-                    type = "search", page = page, query = query,
-                    afterTime = afterTime?.let(BaseApi.dateTimeFormatter::print),
-                    beforeTime = beforeTime?.let(BaseApi.dateTimeFormatter::print)
+                    type = "search", page = page, query = query
             ))
         }
 

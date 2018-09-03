@@ -23,7 +23,7 @@
 
         <activity android:name=".ui.activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".ui.activities.SearchResultActivity" />
+        <activity android:name=".ui.activities.FilteredResultActivity" />
 
     </application>
 
