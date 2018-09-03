@@ -11,6 +11,16 @@
     card_view:cardCornerRadius="0dp"
     card_view:cardElevation="4dp">
 
+    <ImageView
+        android:id="@+id/news_item_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        card_view:layout_constraintStart_toStartOf="parent"
+        card_view:layout_constraintEnd_toEndOf="parent"
+        card_view:layout_constraintBottom_toBottomOf="parent"
+        card_view:layout_constraintTop_toTopOf="parent"
+        android:src="@color/colorTextShadow" />
+
     <android.support.constraint.ConstraintLayout
         android:id="@+id/news_list_item"
         android:layout_width="match_parent"
@@ -19,7 +29,6 @@
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
         android:paddingTop="10dp">
-
 
         <TextView
             android:id="@+id/news_item_title"
@@ -89,7 +98,6 @@
             android:theme="@style/NewsAttribute"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintTop_toBottomOf="@+id/news_item_channel" />
-
 
     </android.support.constraint.ConstraintLayout>
 

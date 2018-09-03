@@ -64,6 +64,11 @@ dependencies {
 
     implementation 'com.beust:klaxon:3.0.1'
 
+    implementation 'jp.wasabeef:recyclerview-animators:2.3.0'
+
+    implementation 'me.zhanghai.android.materialprogressbar:library:1.4.2'
+
+
     kapt 'com.github.bumptech.glide:compiler:4.7.1'
     kapt "android.arch.lifecycle:compiler:$lifecycle_version"
 

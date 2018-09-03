@@ -11,4 +11,6 @@
     <string name="main_favorite">收藏</string>
     <string name="main_recommend">推荐</string>
     <string name="login_register_title">用户登录</string>
+    <string name="loading_more">正在加载更多</string>
+    <string name="no_more">没有更多内容了</string>
 </resources>

@@ -7,11 +7,25 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
     <android.support.v7.widget.RecyclerView
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:drawSelectorOnTop="false"
         android:id="@+id/timeline_list"
         android:background="#EEEEEE"/>
+
+    <include
+        android:id="@+id/timeline_footer"
+        layout="@layout/list_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
+
+    </FrameLayout>
 
 </android.support.v4.widget.SwipeRefreshLayout>

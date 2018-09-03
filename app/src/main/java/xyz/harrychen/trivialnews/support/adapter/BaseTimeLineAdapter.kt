@@ -37,9 +37,12 @@ class BaseTimeLineAdapter(
             news_item_author.text = "作者： ${item.author}"
             news_item_statistics.text = "${item.likeNum} 点赞 · ${item.commentNum} 评论"
 
+            news_item_shadow.visibility = if (item.hasRead) View.VISIBLE else View.INVISIBLE
+
             when(item.picture.isBlank()) {
                 true -> {
                     news_item_picture.visibility = View.GONE
+                    news_item_picture.layout(0, 0, 0, 0)
                     Glide.with(this.context).clear(news_item_picture)
                 }
                 false -> {

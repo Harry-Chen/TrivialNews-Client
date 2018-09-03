@@ -21,5 +21,7 @@ open class News(
         @SerializedName("pubdate")
         var publishDate: Date = Date(),
         var link: String = "",
-        var picture: String = ""
+        var picture: String = "",
+        @SerializedName("has_read")
+        var hasRead: Boolean = false
 ) : RealmObject()
