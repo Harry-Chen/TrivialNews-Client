@@ -12,8 +12,21 @@ import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.support.api.BaseApi
 
 class BaseTimeLineAdapter(
-    var newsData: MutableList<News>
+    private var newsData: MutableList<News> = MutableList(0) {News()}
 ) : RecyclerView.Adapter<BaseTimeLineAdapter.NewsItemViewHolder>() {
+
+
+    fun setNews(news: Collection<News>) {
+        val oldSize = newsData.size
+        newsData = news.toMutableList()
+        notifyItemRangeChanged(0,  Math.max(newsData.size, oldSize))
+    }
+
+    fun addNews(news: Collection<News>) {
+        val oldSize = newsData.size
+        newsData.addAll(news)
+        notifyItemRangeChanged(oldSize, news.size)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsItemViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)

@@ -48,9 +48,9 @@ interface NewsApi {
             ))
         }
 
-        fun getFavoriteNews(page: Int): Single<List<News>> {
+        fun getFavoriteNews(): Single<List<News>> {
             return BaseApi.observeSingleSubscribableApi(create().getNewsTimeline(
-                    type = "favorite", page = page
+                    type = "favorite", page = 0, count = Integer.MAX_VALUE
             ))
         }
 

@@ -7,7 +7,7 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.AnkoLogger
 import xyz.harrychen.trivialnews.R
-import xyz.harrychen.trivialnews.ui.fragments.BaseTimeLineFragment
+import xyz.harrychen.trivialnews.ui.fragments.MainTimeLineFragment
 
 class MainActivity : AppCompatActivity(), AnkoLogger {
 
@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
         main_navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
-        supportFragmentManager.beginTransaction().replace(R.id.main_frame, BaseTimeLineFragment()).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.main_frame, MainTimeLineFragment()).commit()
 
     }
 }

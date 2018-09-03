@@ -11,27 +11,33 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import com.jakewharton.rxbinding2.support.v7.widget.scrollEvents
 import com.trello.rxlifecycle2.android.lifecycle.kotlin.bindUntilEvent
+import io.reactivex.Single
+import io.realm.Realm
+import io.realm.RealmConfiguration
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
 import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.refreshable_timeline.view.*
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.support.v4.toast
+import org.jetbrains.anko.uiThread
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.support.adapter.BaseTimeLineAdapter
-import xyz.harrychen.trivialnews.support.api.NewsApi
 
-class BaseTimeLineFragment: Fragment(), AnkoLogger {
+abstract class BaseTimeLineFragment: Fragment(), AnkoLogger {
 
-    private var newsList: MutableList<News> = MutableList(0) {News()}
     private var currentPage = 0
+
+    protected var realmConfig: RealmConfiguration? = null
 
     private lateinit var newsListView: View
     private lateinit var timelineAdapter: BaseTimeLineAdapter
+    private var fromCache = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         newsListView = inflater.inflate(R.layout.refreshable_timeline, container, false)
-        timelineAdapter = BaseTimeLineAdapter(newsList)
+        timelineAdapter = BaseTimeLineAdapter()
 
         with (newsListView.timeline_list) {
             itemAnimator = LandingAnimator()
@@ -41,11 +47,57 @@ class BaseTimeLineFragment: Fragment(), AnkoLogger {
 
         setupRefresher()
         setupLoadMore()
+        loadFromCache()
+        refreshTimeLine()
+
         return newsListView
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    abstract fun loadFromNetwork(page: Int = 0): Single<List<News>>
+
+    private fun loadFromCache() {
+
+        if (realmConfig == null) return
+        doAsync {
+
+            lateinit var cachedNews: MutableList<News>
+
+            Realm.getInstance(realmConfig!!).use {
+                cachedNews = it.copyFromRealm(it.where(News::class.java).findAll())
+            }
+
+            uiThread {
+                timelineAdapter.setNews(cachedNews)
+                fromCache = true
+            }
+        }
+
+    }
+
+    private fun appendToCache(newsList: Collection<News>) {
+
+        if (realmConfig == null) return
+        doAsync {
+            Realm.getInstance(realmConfig!!).use {
+                it.beginTransaction()
+                it.insert(newsList)
+                it.commitTransaction()
+            }
+        }
+
+    }
+
+    private fun clearCache() {
+
+        if (realmConfig == null) return
+        doAsync {
+            Realm.getInstance(realmConfig!!).use {
+                it.beginTransaction()
+                it.deleteAll()
+                it.commitTransaction()
+            }
+        }
+
     }
 
     private var isLoading: Boolean = false
@@ -88,7 +140,9 @@ class BaseTimeLineFragment: Fragment(), AnkoLogger {
                         if (!swipe_refresh.isRefreshing
                                 && !isLoading
                                 && lastItem == manager.itemCount - 1
-                                && event.dy() > 0) {
+                                && event.dy() > 0
+                                && !fromCache
+                        ) {
                             isLoading = true
                             loadMore()
                         }
@@ -99,34 +153,36 @@ class BaseTimeLineFragment: Fragment(), AnkoLogger {
     private fun refreshTimeLine() {
         currentPage = 0
         newsListView.swipe_refresh.isRefreshing = true
-        NewsApi.getTimeline(currentPage).subscribe({ news ->
+        loadFromNetwork(currentPage).subscribe({ news ->
             if (news.isNotEmpty()) {
-                timelineAdapter.notifyItemRangeRemoved(0, timelineAdapter.newsData.size)
-                timelineAdapter.newsData = news.toMutableList()
-                timelineAdapter.notifyItemRangeInserted(0, news.size)
+                clearCache()
+                fromCache = false
+                timelineAdapter.setNews(news)
+                appendToCache(news)
             } else {
                 toast(R.string.no_more)
             }
             newsListView.swipe_refresh.isRefreshing = false
-        },{
-            e -> throw(e)
+        }, {
+            newsListView.swipe_refresh.isRefreshing = false
+            toast(R.string.refresh_failed)
         })
     }
 
 
     private fun loadMore() {
-        NewsApi.getTimeline(currentPage + 1).subscribe({ news ->
+        loadFromNetwork(currentPage + 1).subscribe({ news ->
             if (news.isNotEmpty()) {
                 currentPage++
-                val oldSize = timelineAdapter.newsData.size
-                timelineAdapter.newsData.addAll(news)
-                timelineAdapter.notifyItemRangeInserted(oldSize, news.size)
+                timelineAdapter.addNews(news)
+                appendToCache(news)
             } else {
                 toast(R.string.no_more)
             }
             isLoading = false
-        },{
-            e -> throw(e)
+        }, {
+            isLoading = false
+            toast(R.string.load_more_failed)
         })
     }
 }

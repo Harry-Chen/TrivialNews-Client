@@ -22,6 +22,7 @@ import xyz.harrychen.trivialnews.support.API_BASE_URL
 import xyz.harrychen.trivialnews.support.utils.ApiException
 import java.lang.reflect.Type
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 interface BaseApi {
     companion object {
@@ -49,20 +50,26 @@ interface BaseApi {
             }
         }
 
-        private var httpClient = OkHttpClient.Builder()
-                .addInterceptor(newsApiResponseInterceptor).build()
+        private val fromBuilder =
+                { builder: OkHttpClient.Builder ->
+                    builder.addInterceptor(newsApiResponseInterceptor)
+                            .connectTimeout(3, TimeUnit.SECONDS)
+                            .writeTimeout(3, TimeUnit.SECONDS)
+                            .readTimeout(3, TimeUnit.SECONDS)
+                            .build()
+                }
 
+        private var httpClient = fromBuilder(OkHttpClient.Builder())
 
         fun setToken(token: String) {
-            httpClient = OkHttpClient
+            httpClient = fromBuilder(OkHttpClient
                     .Builder()
                     .addInterceptor { chain: Interceptor.Chain ->
                         val request = chain.request()
-                        val newRequest = request.newBuilder().header("Authorization", "Bearer $token").build()
+                        val newRequest = request.newBuilder()
+                                .header("Authorization", "Bearer $token").build()
                         chain.proceed(newRequest)
-                    }
-                    .addInterceptor(newsApiResponseInterceptor)
-                    .build()
+                    })
             RETROFIT = buildRetrofit()
         }
 
@@ -78,7 +85,7 @@ interface BaseApi {
 
         private val GSON by lazy {
             GsonBuilder()
-                    .setExclusionStrategies(object:ExclusionStrategy{
+                    .setExclusionStrategies(object : ExclusionStrategy {
                         override fun shouldSkipClass(clazz: Class<*>?): Boolean {
                             return false
                         }
