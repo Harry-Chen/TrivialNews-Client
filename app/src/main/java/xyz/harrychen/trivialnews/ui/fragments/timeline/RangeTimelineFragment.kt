@@ -1,11 +1,10 @@
-package xyz.harrychen.trivialnews.ui.fragments
+package xyz.harrychen.trivialnews.ui.fragments.timeline
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.reactivex.Single
-import org.jetbrains.anko.warn
 import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.support.api.NewsApi
 

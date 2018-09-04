@@ -15,10 +15,10 @@ import org.jetbrains.anko.*
 import org.joda.time.LocalDate
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.support.LOCAL_TIME_ZONE
-import xyz.harrychen.trivialnews.ui.fragments.BaseTimelineFragment
-import xyz.harrychen.trivialnews.ui.fragments.FavoriteFragment
-import xyz.harrychen.trivialnews.ui.fragments.MainTimelineFragment
-import xyz.harrychen.trivialnews.ui.fragments.RecommendFragment
+import xyz.harrychen.trivialnews.ui.fragments.timeline.BaseTimelineFragment
+import xyz.harrychen.trivialnews.ui.fragments.timeline.FavoriteFragment
+import xyz.harrychen.trivialnews.ui.fragments.timeline.MainTimelineFragment
+import xyz.harrychen.trivialnews.ui.fragments.timeline.RecommendFragment
 
 
 class MainActivity : AppCompatActivity(), AnkoLogger {

@@ -34,4 +34,5 @@
     <string name="add_favorite_failed">收藏失败</string>
     <string name="delete_favorite_success">取消收藏成功</string>
     <string name="delete_favorite_failed">取消收藏失败</string>
+    <string name="comment_submit">提交</string>
 </resources>

@@ -10,9 +10,7 @@
     android:gravity="bottom"
     sothree:umanoPanelHeight="48dp"
     sothree:umanoShadowHeight="4dp"
-    sothree:umanoDragView="@id/detail_comment_header"
-
-    sothree:umanoAnchorPoint="0.8">
+    sothree:umanoDragView="@id/detail_comment_header">
 
     <android.support.design.widget.CoordinatorLayout
         xmlns:tools="http://schemas.android.com/tools"

@@ -1,4 +1,4 @@
-package xyz.harrychen.trivialnews.ui.fragments
+package xyz.harrychen.trivialnews.ui.fragments.timeline
 
 import android.os.Bundle
 import android.view.LayoutInflater

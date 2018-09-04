@@ -7,10 +7,13 @@ import android.support.customtabs.CustomTabsIntent
 import android.support.design.chip.Chip
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.trello.rxlifecycle2.android.lifecycle.kotlin.bindUntilEvent
 import io.realm.Realm
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
+import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.activity_news_detail.*
 import kotlinx.android.synthetic.main.news_detail_comment.*
 import org.jetbrains.anko.AnkoLogger
@@ -18,8 +21,10 @@ import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import xyz.harrychen.trivialnews.R
+import xyz.harrychen.trivialnews.models.Comment
 import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.support.BAIKE_URI_PREFIX
+import xyz.harrychen.trivialnews.support.adapter.CommentAdapter
 import xyz.harrychen.trivialnews.support.api.NewsApi
 import xyz.harrychen.trivialnews.support.api.UserApi
 import xyz.harrychen.trivialnews.support.utils.RealmHelper
@@ -30,6 +35,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
     private var id: Int = 0
     private lateinit var link: String
+    private lateinit var commentAdapter: CommentAdapter
 
 
     private val netIntent by lazy {
@@ -60,8 +66,8 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         detail_sliding_layout.addPanelSlideListener(object:SlidingUpPanelLayout.PanelSlideListener{
             override fun onPanelSlide(panel: View?,
                                       slideOffset: Float) {
-                detail_comment_arrow.rotation = if (slideOffset >= 0.7) 180f
-                                                else slideOffset / 0.7f * 180
+                detail_comment_arrow.rotation = if (slideOffset >= 0.5) 180f
+                                                else slideOffset / 0.5f * 180
             }
 
             override fun onPanelStateChanged(panel: View?,
@@ -153,6 +159,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
                 .subscribe({
                     detail_favorite_button.setFavoriteSuppressListener(it.favorite)
                     setKeywords(it.keywords)
+                    loadComments(it.comments)
                 }, {
                     throw(it)
                 })
@@ -170,6 +177,18 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
             detail_keyword_chips.addView(chip)
         }
     }
+
+
+    private fun loadComments(comments: List<Comment>) {
+        detail_comment_title.text = getString(R.string.detail_comment_title).format(comments.size)
+        commentAdapter = CommentAdapter(comments.toMutableList())
+        with (detail_comment_list) {
+            itemAnimator = LandingAnimator()
+            layoutManager = LinearLayoutManager(this.context)
+            adapter = ScaleInAnimationAdapter(commentAdapter)
+        }
+    }
+
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()

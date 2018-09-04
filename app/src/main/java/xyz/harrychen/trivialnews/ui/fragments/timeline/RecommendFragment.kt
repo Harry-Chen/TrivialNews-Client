@@ -1,4 +1,4 @@
-package xyz.harrychen.trivialnews.ui.fragments
+package xyz.harrychen.trivialnews.ui.fragments.timeline
 
 import io.reactivex.Single
 import xyz.harrychen.trivialnews.models.News

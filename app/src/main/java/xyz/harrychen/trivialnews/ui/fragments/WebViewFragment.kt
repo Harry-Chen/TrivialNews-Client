@@ -27,9 +27,11 @@ class WebViewFragment : Fragment() {
             loadUrl(url)
 
             with (settings) {
+                domStorageEnabled = true
+                javaScriptEnabled = true
                 builtInZoomControls = true
                 displayZoomControls = false
-                setInitialScale(200)
+                // setInitialScale(200)
             }
 
            webViewClient = NewsWebViewClient()

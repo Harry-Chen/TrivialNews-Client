@@ -1,4 +1,4 @@
-package xyz.harrychen.trivialnews.ui.fragments
+package xyz.harrychen.trivialnews.ui.fragments.timeline
 
 import android.arch.lifecycle.Lifecycle
 import android.os.Bundle

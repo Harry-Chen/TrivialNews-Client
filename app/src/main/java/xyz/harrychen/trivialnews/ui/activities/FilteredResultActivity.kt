@@ -4,13 +4,12 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_search_result.*
 import org.joda.time.DateTime
-import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.support.api.BaseApi
-import xyz.harrychen.trivialnews.ui.fragments.BaseTimelineFragment
-import xyz.harrychen.trivialnews.ui.fragments.RangeTimelineFragment
-import xyz.harrychen.trivialnews.ui.fragments.SearchResultFragment
+import xyz.harrychen.trivialnews.ui.fragments.timeline.BaseTimelineFragment
+import xyz.harrychen.trivialnews.ui.fragments.timeline.RangeTimelineFragment
+import xyz.harrychen.trivialnews.ui.fragments.timeline.SearchResultFragment
 
 
 class FilteredResultActivity : AppCompatActivity() {
