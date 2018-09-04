@@ -1,18 +1,18 @@
 package xyz.harrychen.trivialnews.ui.activities
 
+import android.arch.lifecycle.Lifecycle
 import android.os.Bundle
 import android.support.design.internal.BottomNavigationItemView
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
-import android.view.View
 import com.miguelcatalan.materialsearchview.MaterialSearchView
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
+import com.jakewharton.rxbinding2.view.clicks
+import com.trello.rxlifecycle2.android.lifecycle.kotlin.bindUntilEvent
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.*
-import org.joda.time.DateTimeZone
 import org.joda.time.LocalDate
-import org.joda.time.LocalDateTime
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.support.LOCAL_TIME_ZONE
 import xyz.harrychen.trivialnews.ui.fragments.BaseTimelineFragment
@@ -74,6 +74,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
         initNavigation()
         initToolbarAction()
+        initFloatingActionBar()
 
     }
 
@@ -131,7 +132,12 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             }
         })
 
+    }
 
+    private fun initFloatingActionBar() {
+        main_fab.clicks().bindUntilEvent(this, Lifecycle.Event.ON_DESTROY).subscribe{
+            fragments[nowFragmentId]!!.scrollAndRefresh()
+        }
     }
 
 }
