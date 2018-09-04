@@ -26,21 +26,16 @@ class LoginActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        createWebView()
         checkToken()
         setTitle(R.string.login_register_title)
         setContentView(R.layout.activity_login)
         initForm()
     }
 
-    private fun createWebView(): WebView {
-        return WebView(this)
-    }
-
 
     private fun checkToken() {
         doAsync {
-            var token: User? = null;
+            var token: User? = null
             with (Realm.getInstance(RealmHelper.CONFIG_USER)) {
                 token = this.where(User::class.java).equalTo("id", 0 as Int).findFirst()
                 if (token != null) {

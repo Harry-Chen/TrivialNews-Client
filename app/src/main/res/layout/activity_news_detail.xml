@@ -10,7 +10,7 @@
     android:gravity="bottom"
     sothree:umanoPanelHeight="48dp"
     sothree:umanoShadowHeight="4dp"
-    sothree:umanoDragView="@+id/detail_panel_header"
+    sothree:umanoDragView="@id/detail_comment_header"
 
     sothree:umanoAnchorPoint="0.8">
 
@@ -56,17 +56,64 @@
 
     </android.support.design.widget.AppBarLayout>
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/detail_web"
+            android:orientation="vertical"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        </ScrollView>
+            <LinearLayout
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/detail_keyword_header"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp">
+
+                <TextView
+                    android:id="@+id/detail_keyword_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/detail_keyword_title"
+                    android:layout_margin="5dp"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Chip"
+                    android:textSize="18sp" />
+
+                <HorizontalScrollView
+                    android:id="@+id/detail_keyword_scroll"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp">
+
+                    <android.support.design.chip.ChipGroup xmlns:chip="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/detail_keyword_chips"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        chip:singleLine="true" />
+
+                </HorizontalScrollView>
+
+            </LinearLayout>
+
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/detail_web_scroll">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/detail_web_fragment"/>
+
+            </ScrollView>
+
+        </LinearLayout>
 
     </android.support.design.widget.CoordinatorLayout>
 
-    <include layout="@layout/news_detail_panel" />
+    <include layout="@layout/news_detail_comment" />
 
 
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>

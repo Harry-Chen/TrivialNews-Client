@@ -8,7 +8,7 @@
 
     <android.support.constraint.ConstraintLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/detail_panel_header"
+        android:id="@+id/detail_comment_header"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:gravity="center_vertical"
@@ -16,56 +16,36 @@
         android:layout_marginLeft="5dp">
 
         <TextView
-            android:id="@+id/detail_panel_title"
+            android:id="@+id/detail_comment_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/detail_keyword_title"
-            android:layout_margin="5dp"
+            android:text="@string/detail_comment_title"
+            android:layout_margin="10dp"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Chip"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:textSize="18sp" />
 
-        <HorizontalScrollView
-            android:id="@+id/detail_panel_chip"
+        <View
+            android:id="@+id/detail_comment_stub"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/detail_panel_arrow"
-            app:layout_constraintStart_toEndOf="@+id/detail_panel_title"
-            app:layout_constraintTop_toTopOf="parent">
-
-        <android.support.design.chip.ChipGroup xmlns:chip="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/detail_chip_group"
-            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            chip:singleLine="true">
+            app:layout_constraintStart_toEndOf="@id/detail_comment_title"
+            app:layout_constraintEnd_toStartOf="@id/detail_comment_arrow"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-            <android.support.design.chip.Chip
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="This" />
-
-            <android.support.design.chip.Chip
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="is" />
-
-        </android.support.design.chip.ChipGroup>
-
-        </HorizontalScrollView>
 
         <ImageView
-            android:id="@+id/detail_panel_arrow"
+            android:id="@+id/detail_comment_arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:src="@drawable/ic_keyboard_arrow_up_black_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/detail_panel_chip"
+            app:layout_constraintStart_toEndOf="@+id/detail_comment_stub"
             app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>

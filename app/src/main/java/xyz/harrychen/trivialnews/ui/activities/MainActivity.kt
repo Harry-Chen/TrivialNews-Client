@@ -119,6 +119,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
                 today.year, today.monthOfYear - 1, today.dayOfMonth)
         dialog.setStartTitle(getString(R.string.date_begin))
         dialog.setEndTitle(getString(R.string.date_end))
+        @Suppress("DEPRECATION")
         dialog.show(fragmentManager, "DateRangePicker")
     }
 

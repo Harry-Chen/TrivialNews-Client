@@ -5,9 +5,10 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import xyz.harrychen.trivialnews.support.utils.NewsWebViewClient
+import android.webkit.WebSettings
 import android.webkit.WebView
-
+import android.webkit.WebViewClient
+import xyz.harrychen.trivialnews.support.utils.NewsWebViewClient
 
 
 class WebViewFragment : Fragment() {
@@ -22,13 +23,15 @@ class WebViewFragment : Fragment() {
         }
         mWebView = WebView(activity)
 
+        val url = arguments!!["link"] as String
+
         with (mWebView!!) {
-            loadUrl(arguments!!["link"] as String)
+            loadUrl(url)
 
             with (settings) {
-                javaScriptEnabled = true
-                useWideViewPort = true
-                loadWithOverviewMode = true
+                builtInZoomControls = true
+                displayZoomControls = false
+                setInitialScale(200)
             }
 
            webViewClient = NewsWebViewClient()
@@ -39,11 +42,11 @@ class WebViewFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        mWebView?.onPause()
+        //mWebView?.onPause()
     }
 
     override fun onResume() {
-        mWebView?.onResume()
+        //mWebView?.onResume()
         super.onResume()
     }
 

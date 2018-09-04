@@ -21,10 +21,11 @@ class BaseTimelineAdapter(
 
 
     fun setNews(news: Collection<News>) {
-        val oldSize = newsData.size
-        notifyItemRangeRemoved(0, oldSize)
+        // val oldSize = newsData.size
+        // notifyItemRangeRemoved(0, oldSize)
         newsData = news.toMutableList()
-        notifyItemRangeInserted(0,  newsData.size)
+        // notifyItemRangeInserted(0,  newsData.size)
+        notifyDataSetChanged()
     }
 
     fun addNews(news: Collection<News>) {
