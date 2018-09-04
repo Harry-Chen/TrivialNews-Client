@@ -10,13 +10,19 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.trello.rxlifecycle2.android.lifecycle.kotlin.bindUntilEvent
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_news_detail.*
 import kotlinx.android.synthetic.main.news_detail_comment.*
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import xyz.harrychen.trivialnews.R
+import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.support.BAIKE_URI_PREFIX
 import xyz.harrychen.trivialnews.support.api.NewsApi
+import xyz.harrychen.trivialnews.support.api.UserApi
+import xyz.harrychen.trivialnews.support.utils.RealmHelper
 import xyz.harrychen.trivialnews.ui.fragments.WebViewFragment
 
 class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
@@ -24,6 +30,8 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
     private var id: Int = 0
     private lateinit var link: String
+
+
     private val netIntent by lazy {
         CustomTabsIntent.Builder()
                 .setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary))
@@ -76,6 +84,54 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
             setDisplayShowHomeEnabled(true)
         }
         title = getString(R.string.news_detail_title)
+
+
+        detail_favorite_button.setAnimateFavorite(true)
+        detail_favorite_button.setAnimateUnfavorite(true)
+
+        detail_favorite_button.setOnFavoriteChangeListener { _, favorite ->
+            when (favorite) {
+                true -> {
+                    UserApi.addFavoriteNews(listOf(id)).subscribe({
+                        snackbar(detail_coordinator, R.string.add_favorite_success)
+                        doAsync {
+                            var news: News? = null
+
+                            with(Realm.getInstance(RealmHelper.CONFIG_NEWS_TIMELINE)) {
+                                news = copyFromRealm(this.where(News::class.java)
+                                        .equalTo("id", id).findFirst()!!)
+                            }
+
+                            with(Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVIROTE)) {
+                                beginTransaction()
+                                insertOrUpdate(news!!)
+                                commitTransaction()
+                            }
+                        }
+                    }, {
+                        snackbar(detail_coordinator, R.string.add_favorite_failed)
+                        detail_favorite_button.setFavoriteSuppressListener(false)
+                    })
+
+                }
+                false -> {
+                    UserApi.deleteFavoriteNews(listOf(id)).subscribe({
+                        snackbar(detail_coordinator, R.string.delete_favorite_success)
+                        doAsync {
+                            with (Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVIROTE)) {
+                                beginTransaction()
+                                where(News::class.java).equalTo("id", id)
+                                        .findAll().deleteAllFromRealm()
+                                commitTransaction()
+                            }
+                        }
+                    },{
+                        snackbar(detail_coordinator, R.string.delete_favorite_failed)
+                        detail_favorite_button.setFavoriteSuppressListener(true)
+                    })
+                }
+            }
+        }
     }
 
 
@@ -95,7 +151,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
     private fun loadNewsDetails() {
         NewsApi.getNewsDetail(id).bindUntilEvent(this, Lifecycle.Event.ON_STOP)
                 .subscribe({
-                    detail_favorite_button.isFavorite = it.favorite
+                    detail_favorite_button.setFavoriteSuppressListener(it.favorite)
                     setKeywords(it.keywords)
                 }, {
                     throw(it)

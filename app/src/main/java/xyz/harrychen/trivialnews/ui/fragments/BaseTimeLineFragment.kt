@@ -202,15 +202,11 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
         newsListView.swipe_refresh.isRefreshing = true
         loadFromNetwork(currentPage)
                 .bindUntilEvent(this, Lifecycle.Event.ON_PAUSE).subscribe({ news ->
-            if (news.isNotEmpty()) {
                 clearCache()
                 fromCache = false
                 timelineAdapter.setNews(news)
                 appendToCache(news)
                 showSnack(getString(R.string.load_more_news).format(news.size))
-            } else {
-                showSnack(R.string.no_more)
-            }
             newsListView.swipe_refresh.isRefreshing = false
         }, {
             newsListView.swipe_refresh.isRefreshing = false

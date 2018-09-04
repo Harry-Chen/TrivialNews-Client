@@ -2,7 +2,7 @@ package xyz.harrychen.trivialnews.support.api
 
 import io.reactivex.Completable
 import retrofit2.http.Body
-import retrofit2.http.DELETE
+import retrofit2.http.HTTP
 import retrofit2.http.POST
 import xyz.harrychen.trivialnews.models.QueryParameter
 
@@ -12,7 +12,7 @@ interface CommentApi {
     fun addComment(@Body addComment: QueryParameter.AddComment): Completable
 
 
-    @DELETE("/comment")
+    @HTTP(method = "DELETE", path = "/comment", hasBody = true)
     fun deleteComment(@Body commentId: QueryParameter.CommentId): Completable
 
 

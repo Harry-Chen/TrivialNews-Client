@@ -14,11 +14,11 @@ interface UserApi {
 
 
     @PUT("/user/favorite")
-    fun addFavoriteNews(@Body newsId: QueryParameter.NewsId): Completable
+    fun addFavoriteNews(@Body newsId: QueryParameter.NewsIds): Completable
 
 
-    @DELETE("/user/favorite")
-    fun deleteFavoriteNews(@Body newsId: QueryParameter.NewsId): Completable
+    @HTTP(method = "DELETE", path = "/user/favorite", hasBody = true)
+    fun deleteFavoriteNews(@Body newsId: QueryParameter.NewsIds): Completable
 
 
     companion object {
@@ -32,14 +32,14 @@ interface UserApi {
                     .loginOrRegister(parameter))
         }
 
-        fun addFavoriteNews(newsId: Int): Completable {
+        fun addFavoriteNews(newsIds: List<Int>): Completable {
             return BaseApi.observeCompletableApi(create()
-                    .addFavoriteNews(QueryParameter.NewsId(newsId)))
+                    .addFavoriteNews(QueryParameter.NewsIds(newsIds)))
         }
 
-        fun deleteFavoriteNews(newsId: Int): Completable {
+        fun deleteFavoriteNews(newsIds: List<Int>): Completable {
             return BaseApi.observeCompletableApi(create()
-                    .deleteFavoriteNews(QueryParameter.NewsId(newsId)))
+                    .deleteFavoriteNews(QueryParameter.NewsIds(newsIds)))
         }
 
     }

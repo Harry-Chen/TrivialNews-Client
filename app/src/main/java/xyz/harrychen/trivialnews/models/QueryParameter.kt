@@ -5,8 +5,8 @@ import xyz.harrychen.trivialnews.support.NEWS_PER_LOAD
 import java.util.*
 
 object QueryParameter {
-    data class NewsId(
-            @SerializedName("news_id") val id: Int
+    data class NewsIds(
+            @SerializedName("news_ids") val ids: List<Int>
     )
 
     data class CommentId(

@@ -14,7 +14,7 @@ interface ChannelApi {
     @PUT("/channel/subscribe")
     fun subscribeChannels(@Body channelIds: QueryParameter.ChannelIds): Completable
 
-    @DELETE("/channel/subscribe")
+    @HTTP(method = "DELETE", path = "/channel/subscribe", hasBody = true)
     fun unSubscribeChannels(@Body channelIds: QueryParameter.ChannelIds): Completable
 
     companion object {
