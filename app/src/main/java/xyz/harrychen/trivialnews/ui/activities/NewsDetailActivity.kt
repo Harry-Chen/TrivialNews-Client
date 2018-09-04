@@ -8,6 +8,8 @@ import android.support.design.chip.Chip
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.View
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.trello.rxlifecycle2.android.lifecycle.kotlin.bindUntilEvent
@@ -23,11 +25,13 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.Comment
 import xyz.harrychen.trivialnews.models.News
+import xyz.harrychen.trivialnews.models.User
 import xyz.harrychen.trivialnews.support.BAIKE_URI_PREFIX
 import xyz.harrychen.trivialnews.support.adapter.CommentAdapter
 import xyz.harrychen.trivialnews.support.api.NewsApi
 import xyz.harrychen.trivialnews.support.api.UserApi
 import xyz.harrychen.trivialnews.support.utils.RealmHelper
+import xyz.harrychen.trivialnews.support.utils.SwipeToDeleteCallback
 import xyz.harrychen.trivialnews.ui.fragments.WebViewFragment
 
 class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
@@ -36,6 +40,11 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
     private var id: Int = 0
     private lateinit var link: String
     private lateinit var commentAdapter: CommentAdapter
+    private val currentUser by lazy {
+        with(Realm.getInstance(RealmHelper.CONFIG_USER)) {
+            copyToRealm(where(User::class.java).equalTo("id", 0 as Int).findFirst()!!)
+        }
+    }
 
 
     private val netIntent by lazy {
@@ -108,7 +117,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
                                         .equalTo("id", id).findFirst()!!)
                             }
 
-                            with(Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVIROTE)) {
+                            with(Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVORITE)) {
                                 beginTransaction()
                                 insertOrUpdate(news!!)
                                 commitTransaction()
@@ -124,7 +133,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
                     UserApi.deleteFavoriteNews(listOf(id)).subscribe({
                         snackbar(detail_coordinator, R.string.delete_favorite_success)
                         doAsync {
-                            with (Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVIROTE)) {
+                            with (Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVORITE)) {
                                 beginTransaction()
                                 where(News::class.java).equalTo("id", id)
                                         .findAll().deleteAllFromRealm()
@@ -187,6 +196,18 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
             layoutManager = LinearLayoutManager(this.context)
             adapter = ScaleInAnimationAdapter(commentAdapter)
         }
+
+        val swipeHandler = object:SwipeToDeleteCallback(this, {
+            commentAdapter.getItem(it).username == currentUser.username
+        }) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                commentAdapter.notifyDataSetChanged()
+                //commentAdapter.notifyItemChanged(viewHolder.adapterPosition)
+            }
+        }
+
+        ItemTouchHelper(swipeHandler).attachToRecyclerView(detail_comment_list)
+
     }
 
 

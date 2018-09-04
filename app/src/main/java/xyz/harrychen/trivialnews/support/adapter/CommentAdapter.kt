@@ -27,6 +27,19 @@ class CommentAdapter(
     override fun onBindViewHolder(holder: CommentViewHolder, position: Int) =
             holder.bind(comments[position], position)
 
+    fun getItem(position: Int): Comment {
+        return comments[position]
+    }
+
+    fun addItem(comment: Comment) {
+        comments.add(comment)
+        notifyItemInserted(comments.size - 1)
+    }
+
+    fun deleteItem(position: Int) {
+        comments.removeAt(position)
+        notifyItemRemoved(position)
+    }
 
 
     inner class CommentViewHolder(val view: View) : RecyclerView.ViewHolder(view) {

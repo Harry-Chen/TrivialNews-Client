@@ -8,7 +8,7 @@ import xyz.harrychen.trivialnews.support.utils.RealmHelper
 class FavoriteFragment: BaseTimelineFragment() {
 
     init {
-        realmConfig = RealmHelper.CONFIG_NEWS_FAVIROTE
+        realmConfig = RealmHelper.CONFIG_NEWS_FAVORITE
         infiniteScroll = false
         needNetwork = false
     }

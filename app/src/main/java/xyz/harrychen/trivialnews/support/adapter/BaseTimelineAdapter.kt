@@ -54,7 +54,7 @@ class BaseTimelineAdapter(
             news_item_channel.text = "频道编号：${item.channelId}"
             news_item_date.text = BaseApi.dateTimeFormatter.print(LocalDateTime(item.publishDate))
             news_item_author.text = context.getString(R.string.adapter_author).format(item.author)
-            news_item_statistics.text = context.getString(R.string.adapter_statistics).format(item.likeNum, item.commentNum)
+            news_item_statistics.text = context.getString(R.string.adapter_statistics).format(item.readNum, item.commentNum)
 
             news_item_shadow.visibility = if (item.hasRead) View.VISIBLE else View.INVISIBLE
 

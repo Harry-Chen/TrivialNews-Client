@@ -23,7 +23,7 @@
     <string name="range_result_title">%s 到 %s</string>
     <string name="menu_date_range">日期范围</string>
     <string name="adapter_author">作者： %s</string>
-    <string name="adapter_statistics">%d 点赞 · %d 评论</string>
+    <string name="adapter_statistics">%d 阅读 · %d 评论</string>
     <string name="date_range_error">日期范围不合法！</string>
     <string name="news_detail_title">新闻详情</string>
     <string name="date_begin">开始日期</string>

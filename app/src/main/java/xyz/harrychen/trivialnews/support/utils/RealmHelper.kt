@@ -19,7 +19,7 @@ class RealmHelper{
     private class UserModel
 
     companion object {
-        val CONFIG_USER by lazy {
+        val CONFIG_USER: RealmConfiguration by lazy {
             RealmConfiguration.Builder()
                     .name("user.realm")
                     .modules(UserModel())
@@ -28,7 +28,7 @@ class RealmHelper{
                     .build()
         }
 
-        val CONFIG_CHANNELS by lazy {
+        val CONFIG_CHANNELS: RealmConfiguration by lazy {
             RealmConfiguration.Builder()
                     .name("channels.realm")
                     .modules(ChannelModel())
@@ -37,20 +37,20 @@ class RealmHelper{
                     .build()
         }
 
-        val CONFIG_NEWS_TIMELINE by lazy {
+        val CONFIG_NEWS_TIMELINE: RealmConfiguration by lazy {
             RealmConfiguration.Builder()
                     .name("news_timeline.realm")
                     .modules(NewsModel())
-                    .schemaVersion(1)
+                    .schemaVersion(2)
                     .deleteRealmIfMigrationNeeded()
                     .build()
         }
 
-        val CONFIG_NEWS_FAVIROTE by lazy {
+        val CONFIG_NEWS_FAVORITE: RealmConfiguration by lazy {
             RealmConfiguration.Builder()
                     .name("news_favorite.realm")
                     .modules(NewsModel())
-                    .schemaVersion(1)
+                    .schemaVersion(2)
                     .deleteRealmIfMigrationNeeded()
                     .build()
         }
