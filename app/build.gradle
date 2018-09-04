@@ -73,6 +73,9 @@ dependencies {
 
     implementation 'com.miguelcatalan:materialsearchview:1.4.0'
 
+    implementation ('com.borax12.materialdaterangepicker:library:1.9') {
+        exclude group: 'com.android.support'
+    }
 
     kapt 'com.github.bumptech.glide:compiler:4.7.1'
     kapt "android.arch.lifecycle:compiler:$lifecycle_version"

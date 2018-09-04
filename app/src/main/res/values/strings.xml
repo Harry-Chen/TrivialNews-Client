@@ -18,8 +18,9 @@
     <string name="load_more_failed">加载更多内容失败</string>
     <string name="menu_search">搜索</string>
     <string name="search_result_title">"%s" 的搜索结果</string>
-    <string name="range_result_title">从 %s 到 %s 的新闻</string>
+    <string name="range_result_title">%s 到 %s</string>
     <string name="menu_date_range">日期范围</string>
     <string name="adapter_author">作者： %s</string>
     <string name="adapter_statistics">%d 点赞 · %d 评论</string>
+    <string name="date_range_error">日期范围不合法！</string>
 </resources>

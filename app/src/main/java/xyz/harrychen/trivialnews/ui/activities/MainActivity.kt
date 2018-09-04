@@ -5,15 +5,21 @@ import android.support.design.internal.BottomNavigationItemView
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
+import android.view.View
 import com.miguelcatalan.materialsearchview.MaterialSearchView
+import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.*
+import org.joda.time.DateTimeZone
+import org.joda.time.LocalDate
+import org.joda.time.LocalDateTime
 import xyz.harrychen.trivialnews.R
+import xyz.harrychen.trivialnews.support.LOCAL_TIME_ZONE
 import xyz.harrychen.trivialnews.ui.fragments.BaseTimelineFragment
 import xyz.harrychen.trivialnews.ui.fragments.FavoriteFragment
 import xyz.harrychen.trivialnews.ui.fragments.MainTimelineFragment
 import xyz.harrychen.trivialnews.ui.fragments.RecommendFragment
+
 
 class MainActivity : AppCompatActivity(), AnkoLogger {
 
@@ -50,8 +56,9 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             var fragment = fragments[item.itemId]
             if (fragment == null) {
                 fragment = createFragment(item.itemId)
+                fragment!!.setCoordinatorLayout(main_coordinator)
             }
-            fragments[item.itemId] = fragment!!
+            fragments[item.itemId] = fragment
             supportFragmentManager.beginTransaction().replace(R.id.main_frame, fragment).commit()
         }
 
@@ -86,14 +93,36 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         }
     }
 
-    private fun showDateChooserDialog() {
+    private val filterDateRange = { _: DatePickerDialog,
+                                    year: Int, month: Int, day: Int,
+                                    yearEnd: Int, monthEnd: Int, dayEnd: Int ->
+        val begin = LocalDate(year, month + 1, day)
+                .toDateTimeAtStartOfDay(LOCAL_TIME_ZONE)
+        val end = LocalDate(yearEnd, monthEnd + 1, dayEnd)
+                .toDateTimeAtStartOfDay(LOCAL_TIME_ZONE)
+        if (!end.isBefore(begin)) {
+            startActivity<FilteredResultActivity>("type" to "range",
+                    "beforeDate" to end, "afterDate" to begin)
+        } else {
+            alert(R.string.date_range_error){
+                isCancelable = false
+                yesButton {  }
+            }.show()
+        }
+        Unit
+    }
 
+    private fun showDateChooserDialog() {
+        val today = LocalDate.now()
+        DatePickerDialog.newInstance(DatePickerDialog.OnDateSetListener(filterDateRange),
+                today.year, today.monthOfYear - 1, today.dayOfMonth)
+                .show(fragmentManager, "DateRangePicker")
     }
 
     private fun initToolbarAction() {
         main_search.setOnQueryTextListener(object:MaterialSearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
-                startActivity<FilteredResultActivity>("query" to query)
+                startActivity<FilteredResultActivity>("type" to "search", "query" to query)
                 return true
             }
 

@@ -19,7 +19,6 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
 import jp.wasabeef.recyclerview.animators.LandingAnimator
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.refreshable_timeline.view.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.design.snackbar
@@ -28,7 +27,6 @@ import org.jetbrains.anko.uiThread
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.support.adapter.BaseTimelineAdapter
-import xyz.harrychen.trivialnews.ui.activities.MainActivity
 
 abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
 
@@ -40,18 +38,16 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
 
     private lateinit var newsListView: View
     private lateinit var timelineAdapter: BaseTimelineAdapter
-    private lateinit var snackBarPlace: CoordinatorLayout
+    private var snackBarPlace: CoordinatorLayout? = null
     private var fromCache = false
 
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        with (activity as MainActivity) {
-            snackBarPlace = this.main_coordinator
-        }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
         newsListView = inflater.inflate(R.layout.refreshable_timeline, container, false)
         timelineAdapter = BaseTimelineAdapter()
 
@@ -69,6 +65,10 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
         return newsListView
     }
 
+
+    val setCoordinatorLayout = {view: CoordinatorLayout ->
+        snackBarPlace = view
+    }
 
     fun scrollAndRefresh() {
         with(newsListView.timeline_list.layoutManager!! as LinearLayoutManager) {
@@ -185,41 +185,52 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
         }
     }
 
+    private fun showSnack(content: Any) {
+        if (snackBarPlace != null) {
+            when (content) {
+                is Int -> snackbar(snackBarPlace!!, content)
+                is String -> snackbar(snackBarPlace!!, content)
+            }
+        }
+    }
+
     private fun refreshTimeLine() {
         currentPage = 0
         newsListView.swipe_refresh.isRefreshing = true
-        loadFromNetwork(currentPage).subscribe({ news ->
+        loadFromNetwork(currentPage)
+                .bindUntilEvent(this, Lifecycle.Event.ON_PAUSE).subscribe({ news ->
             if (news.isNotEmpty()) {
                 clearCache()
                 fromCache = false
                 timelineAdapter.setNews(news)
                 appendToCache(news)
-                snackbar(snackBarPlace, getString(R.string.load_more_news).format(news.size))
+                showSnack(getString(R.string.load_more_news).format(news.size))
             } else {
-                snackbar(snackBarPlace, R.string.no_more)
+                showSnack(R.string.no_more)
             }
             newsListView.swipe_refresh.isRefreshing = false
         }, {
             newsListView.swipe_refresh.isRefreshing = false
-            snackbar(snackBarPlace, R.string.refresh_failed)
+            showSnack(R.string.refresh_failed)
         })
     }
 
 
     private fun loadMore() {
-        loadFromNetwork(currentPage + 1).subscribe({ news ->
+        loadFromNetwork(currentPage + 1)
+                .bindUntilEvent(this, Lifecycle.Event.ON_PAUSE).subscribe({ news ->
             if (news.isNotEmpty()) {
                 currentPage++
                 timelineAdapter.addNews(news)
                 appendToCache(news)
-                snackbar(snackBarPlace, getString(R.string.load_more_news).format(news.size))
+                showSnack(getString(R.string.load_more_news).format(news.size))
             } else {
-                snackbar(snackBarPlace, R.string.no_more)
+                showSnack(R.string.no_more)
             }
             isLoading = false
         }, {
             isLoading = false
-            snackbar(snackBarPlace, R.string.load_more_failed)
+            showSnack(R.string.load_more_failed)
         })
     }
 }

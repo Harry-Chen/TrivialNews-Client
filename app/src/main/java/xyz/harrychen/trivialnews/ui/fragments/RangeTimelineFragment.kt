@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.reactivex.Single
+import org.jetbrains.anko.warn
 import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.support.api.NewsApi
 
@@ -18,8 +19,8 @@ class RangeTimelineFragment: BaseTimelineFragment() {
     private lateinit var afterTime: String
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        beforeTime = arguments!!["beforeTime"] as String
-        afterTime = arguments!!["afterTime"] as String
+        beforeTime = arguments!!["beforeDate"] as String
+        afterTime = arguments!!["afterDate"] as String
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
