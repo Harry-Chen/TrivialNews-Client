@@ -11,6 +11,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.View
+import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.widget.textChanges
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.trello.rxlifecycle2.android.lifecycle.kotlin.bindUntilEvent
 import io.realm.Realm
@@ -18,9 +20,8 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
 import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.activity_news_detail.*
 import kotlinx.android.synthetic.main.news_detail_comment.*
-import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.*
 import org.jetbrains.anko.design.snackbar
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.Comment
@@ -28,6 +29,7 @@ import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.models.User
 import xyz.harrychen.trivialnews.support.BAIKE_URI_PREFIX
 import xyz.harrychen.trivialnews.support.adapter.CommentAdapter
+import xyz.harrychen.trivialnews.support.api.CommentApi
 import xyz.harrychen.trivialnews.support.api.NewsApi
 import xyz.harrychen.trivialnews.support.api.UserApi
 import xyz.harrychen.trivialnews.support.utils.RealmHelper
@@ -40,6 +42,16 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
     private var id: Int = 0
     private lateinit var link: String
     private lateinit var commentAdapter: CommentAdapter
+
+    private var commentsNum: Int = 0
+    set(value) {
+        field = value
+        if (detail_comment_title != null) {
+            detail_comment_title.text = getString(R.string.detail_comment_title).format(value)
+        }
+    }
+
+
     private val currentUser by lazy {
         with(Realm.getInstance(RealmHelper.CONFIG_USER)) {
             copyToRealm(where(User::class.java).equalTo("id", 0 as Int).findFirst()!!)
@@ -65,6 +77,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         }
 
         setupSlidePanel()
+        setupPostComment()
         loadNewsPage()
         loadNewsDetails()
 
@@ -150,6 +163,24 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
     }
 
 
+    private fun setupPostComment() {
+        comment_input.textChanges().bindUntilEvent(this, Lifecycle.Event.ON_DESTROY)
+                .subscribe{ comment_submit.isEnabled = it.isNotBlank() }
+
+        comment_submit.clicks().bindUntilEvent(this, Lifecycle.Event.ON_DESTROY).subscribe{
+            CommentApi.addComment(id, comment_input.text.toString().trim())
+                    .subscribe({
+                        commentsNum++
+                        commentAdapter.addItem(it)
+                        comment_input.text.clear()
+                        snackbar(detail_comment_layout, R.string.comment_add_success)
+                    }, {
+                        snackbar(detail_comment_layout, R.string.comment_add_failed)
+                    })
+        }
+    }
+
+
     private fun loadNewsPage() {
 
         val webFragment = WebViewFragment()
@@ -189,7 +220,8 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
 
     private fun loadComments(comments: List<Comment>) {
-        detail_comment_title.text = getString(R.string.detail_comment_title).format(comments.size)
+        commentsNum= comments.size
+
         commentAdapter = CommentAdapter(comments.toMutableList())
         with (detail_comment_list) {
             itemAnimator = LandingAnimator()
@@ -201,8 +233,22 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
             commentAdapter.getItem(it).username == currentUser.username
         }) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                commentAdapter.notifyDataSetChanged()
-                //commentAdapter.notifyItemChanged(viewHolder.adapterPosition)
+                val comment = commentAdapter.getItem(viewHolder.adapterPosition)
+                alert(R.string.comment_delete_confirm) {
+                    isCancelable = false
+                    yesButton {
+                        CommentApi.deleteComment(comment.id).subscribe({
+                            commentsNum--
+                            commentAdapter.deleteItem(viewHolder.adapterPosition)
+                            snackbar(detail_coordinator, R.string.comment_delete_success)
+                        }, {
+                            snackbar(detail_coordinator, R.string.comment_delete_failed)
+                        })
+                    }
+                    noButton {
+                        commentAdapter.notifyDataSetChanged()
+                    }
+                }.show()
             }
         }
 

@@ -16,7 +16,7 @@
     <string name="refresh_failed">刷新失败</string>
     <string name="load_more_news">加载了 %d 条新闻</string>
     <string name="load_more_news_cache">从缓存加载了 %d 条新闻</string>
-    <string name="infinite_scroll_disabled">此模式不支持上拉加载更多</string>
+    <string name="infinite_scroll_disabled">此模式不支持上拉加载更多，请刷新或返回时间轴</string>
     <string name="load_more_failed">加载更多内容失败</string>
     <string name="menu_search">搜索</string>
     <string name="search_result_title">"%s" 的搜索结果</string>
@@ -34,5 +34,12 @@
     <string name="add_favorite_failed">收藏失败</string>
     <string name="delete_favorite_success">取消收藏成功</string>
     <string name="delete_favorite_failed">取消收藏失败</string>
+    <string name="comment_author">来自：%s</string>
+    <string name="comment_hint">向左滑动已有评论可删除</string>
     <string name="comment_submit">提交</string>
+    <string name="comment_delete_confirm">确定要删除这条评论吗？</string>
+    <string name="comment_delete_success">删除评论成功</string>
+    <string name="comment_delete_failed">删除评论失败</string>
+    <string name="comment_add_success">添加评论成功</string>
+    <string name="comment_add_failed">添加评论失败</string>
 </resources>

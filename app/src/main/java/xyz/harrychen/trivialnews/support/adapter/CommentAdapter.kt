@@ -44,7 +44,7 @@ class CommentAdapter(
 
     inner class CommentViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         fun bind(item: Comment, position: Int): Unit = with(view) {
-            comment_author.text = item.username
+            comment_author.text = context.getString(R.string.comment_author).format(item.username)
             comment_time.text = BaseApi.dateTimeFormatter.print(LocalDateTime(item.time))
             comment_content.text = item.content
         }
