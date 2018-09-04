@@ -1,7 +1,6 @@
 package xyz.harrychen.trivialnews.ui.fragments
 
 import android.arch.lifecycle.Lifecycle
-import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.Fragment
@@ -23,10 +22,12 @@ import kotlinx.android.synthetic.main.refreshable_timeline.view.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.support.v4.startActivity
 import org.jetbrains.anko.uiThread
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.support.adapter.BaseTimelineAdapter
+import xyz.harrychen.trivialnews.ui.activities.NewsDetailActivity
 
 abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
 
@@ -35,6 +36,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
     protected var realmConfig: RealmConfiguration? = null
     protected var infiniteScroll = true
     protected var canRefresh = true
+    protected var needNetwork = true
 
     private lateinit var newsListView: View
     private lateinit var timelineAdapter: BaseTimelineAdapter
@@ -42,14 +44,12 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
     private var fromCache = false
 
 
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         newsListView = inflater.inflate(R.layout.refreshable_timeline, container, false)
-        timelineAdapter = BaseTimelineAdapter()
+        timelineAdapter = BaseTimelineAdapter {
+            startActivity<NewsDetailActivity>("id" to it.id, "link" to it.link)
+        }
 
         with(newsListView.timeline_list) {
             itemAnimator = LandingAnimator()
@@ -60,7 +60,8 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
         setupRefresher()
         setupLoadMore()
         loadFromCache()
-        refreshTimeLine()
+
+        if (needNetwork) refreshTimeline()
 
         return newsListView
     }
@@ -81,7 +82,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
                 scroller.targetPosition = 0
                 startSmoothScroll(scroller)
             } else {
-                refreshTimeLine()
+                refreshTimeline()
             }
         }
     }
@@ -102,6 +103,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
             uiThread {
                 timelineAdapter.setNews(cachedNews)
                 fromCache = true
+                showSnack(getString(R.string.load_more_news_cache).format(cachedNews.size))
             }
         }
 
@@ -157,7 +159,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
                     ContextCompat.getColor(context!!, R.color.colorPrimary),
                     ContextCompat.getColor(context!!, R.color.colorAccent))
             setOnRefreshListener {
-                refreshTimeLine()
+                refreshTimeline()
             }
         }
     }
@@ -174,12 +176,13 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
                         if (!swipe_refresh.isRefreshing
                                 && !isLoading
                                 && lastItem == manager.itemCount - 1
-                                && event.dy() > 0
-                                && !fromCache
-                                && infiniteScroll
-                        ) {
-                            isLoading = true
-                            loadMore()
+                                && event.dy() > 0) {
+                            if (fromCache || !infiniteScroll) {
+                                showSnack(R.string.infinite_scroll_disabled)
+                            } else {
+                                isLoading = true
+                                loadMore()
+                            }
                         }
                     }
         }
@@ -194,7 +197,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
         }
     }
 
-    private fun refreshTimeLine() {
+    private fun refreshTimeline() {
         currentPage = 0
         newsListView.swipe_refresh.isRefreshing = true
         loadFromNetwork(currentPage)

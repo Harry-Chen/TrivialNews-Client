@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
 
+@Suppress("unused")
 class BottomNavigationBarBehavior : CoordinatorLayout.Behavior<BottomNavigationView> {
 
     constructor(): super()

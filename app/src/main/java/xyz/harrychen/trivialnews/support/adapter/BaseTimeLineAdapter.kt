@@ -6,13 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.news_list_item.view.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.joda.time.LocalDateTime
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.support.api.BaseApi
 
+typealias OnNewsClickHandler = (news: News) -> Unit
+
 class BaseTimelineAdapter(
-    private var newsData: MutableList<News> = MutableList(0) {News()}
+    private var newsData: MutableList<News> = MutableList(0) {News()},
+    private var newsClickHandler: OnNewsClickHandler
 ) : RecyclerView.Adapter<BaseTimelineAdapter.NewsItemViewHolder>() {
 
 
@@ -64,6 +68,8 @@ class BaseTimelineAdapter(
                     Glide.with(this.context).load(item.picture).into(news_item_picture)
                 }
             }
+
+            this.setOnClickListener { newsClickHandler(item) }
         }
     }
 }

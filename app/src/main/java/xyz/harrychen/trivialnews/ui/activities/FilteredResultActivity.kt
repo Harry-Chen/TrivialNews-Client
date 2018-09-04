@@ -19,9 +19,9 @@ class FilteredResultActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_result)
 
-        with(supportActionBar) {
-            this?.setDisplayHomeAsUpEnabled(true)
-            this?.setDisplayShowHomeEnabled(true)
+        with(supportActionBar!!) {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
         }
 
         lateinit var fragment: BaseTimelineFragment

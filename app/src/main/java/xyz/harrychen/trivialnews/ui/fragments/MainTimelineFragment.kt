@@ -9,6 +9,7 @@ class MainTimelineFragment: BaseTimelineFragment() {
 
     init {
         realmConfig = RealmHelper.CONFIG_NEWS_TIMELINE
+        needNetwork = false
     }
 
     override fun loadFromNetwork(page: Int): Single<List<News>> = NewsApi.getTimeline(page)

@@ -115,9 +115,11 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
     private fun showDateChooserDialog() {
         val today = LocalDate.now()
-        DatePickerDialog.newInstance(DatePickerDialog.OnDateSetListener(filterDateRange),
+        val dialog = DatePickerDialog.newInstance(DatePickerDialog.OnDateSetListener(filterDateRange),
                 today.year, today.monthOfYear - 1, today.dayOfMonth)
-                .show(fragmentManager, "DateRangePicker")
+        dialog.setStartTitle(getString(R.string.date_begin))
+        dialog.setEndTitle(getString(R.string.date_end))
+        dialog.show(fragmentManager, "DateRangePicker")
     }
 
     private fun initToolbarAction() {

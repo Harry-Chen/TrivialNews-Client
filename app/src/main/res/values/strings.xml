@@ -15,6 +15,8 @@
     <string name="no_more">没有更多内容了</string>
     <string name="refresh_failed">刷新失败</string>
     <string name="load_more_news">加载了 %d 条新闻</string>
+    <string name="load_more_news_cache">从缓存加载了 %d 条新闻</string>
+    <string name="infinite_scroll_disabled">此模式不支持上拉加载更多</string>
     <string name="load_more_failed">加载更多内容失败</string>
     <string name="menu_search">搜索</string>
     <string name="search_result_title">"%s" 的搜索结果</string>
@@ -23,4 +25,8 @@
     <string name="adapter_author">作者： %s</string>
     <string name="adapter_statistics">%d 点赞 · %d 评论</string>
     <string name="date_range_error">日期范围不合法！</string>
+    <string name="news_detail_title">新闻详情</string>
+    <string name="date_begin">开始日期</string>
+    <string name="date_end">结束日期</string>
+    <string name="detail_keyword_title">您可能感兴趣：</string>
 </resources>
