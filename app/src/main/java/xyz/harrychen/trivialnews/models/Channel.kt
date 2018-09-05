@@ -8,10 +8,7 @@ open class Channel(
         @PrimaryKey
         @SerializedName("_id")
         var id: Int = 0,
-
         var name: String = "",
+        var description: String = ""
 
-        var description: String = "",
-
-        var subscribed: Boolean = false
 ): RealmObject()

@@ -13,8 +13,8 @@ import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
-import org.jetbrains.anko.uiThread
 import xyz.harrychen.trivialnews.R
+import xyz.harrychen.trivialnews.models.Category
 import xyz.harrychen.trivialnews.models.QueryParameter
 import xyz.harrychen.trivialnews.models.User
 import xyz.harrychen.trivialnews.support.api.BaseApi
@@ -30,30 +30,26 @@ class LoginActivity: AppCompatActivity() {
         checkToken()
         setTitle(R.string.login_register_title)
         setContentView(R.layout.activity_login)
+        fetchChannels()
         initForm()
     }
 
 
     private fun checkToken() {
 
-        var token: User? = null
+        var user: User?
         with (Realm.getInstance(RealmHelper.CONFIG_USER)) {
-            token = this.where(User::class.java).equalTo("id", 0 as Int).findFirst()
-            if (token != null) {
-                token = copyFromRealm(token!!)
+            user = this.where(User::class.java).equalTo("id", 0 as Int).findFirst()
+            if (user != null) {
+                toast(R.string.auto_logged_in)
+                setTokenAndStartMain(user!!.token)
             }
         }
-
-        if (token != null) {
-            toast(R.string.auto_logged_in)
-            setTokenAndStartMain(token!!.token)
-        }
-
     }
 
     private fun setTokenAndStartMain(token: String) {
         BaseApi.setToken(token)
-        fetchChannels()
+        initChannelList()
         startActivity<MainActivity>()
         this.finish()
     }
@@ -92,6 +88,7 @@ class LoginActivity: AppCompatActivity() {
     }
 
 
+
     private fun fetchChannels() {
         ChannelApi.getChannelList().subscribe({
 
@@ -100,7 +97,6 @@ class LoginActivity: AppCompatActivity() {
                 deleteAll()
                 copyToRealm(it)
                 commitTransaction()
-                ChannelLookup.updateChannelInfo(it)
             }
 
             toast(R.string.login_fetch_channel_success)
@@ -110,20 +106,26 @@ class LoginActivity: AppCompatActivity() {
     }
 
 
+    private fun initChannelList() {
+        with (Realm.getInstance(RealmHelper.CONFIG_CHANNELS)) {
+            ChannelLookup.updateChannelInfo(where(Category::class.java).findAll())
+        }
+    }
+
+
     private fun loginOrRegister(parameter: QueryParameter.Register) {
-        UserApi.loginOrRegister(parameter).subscribe({token ->
+        UserApi.loginOrRegister(parameter).subscribe({user ->
 
             doAsync {
                 with (Realm.getInstance(RealmHelper.CONFIG_USER)) {
                     beginTransaction()
-                    copyToRealm(User(username = input_username.text.toString()
-                            , token = token.token))
+                    copyToRealm(user)
                     commitTransaction()
                 }
             }
 
-            toast("${getString(R.string.login_register_success)} ${parameter.username}")
-            setTokenAndStartMain(token.token)
+            toast("${getString(R.string.login_register_success)} ${user.username}")
+            setTokenAndStartMain(user.token)
 
         }, { error ->
             toast("${getString(R.string.login_register_failed)} ${error.message}")

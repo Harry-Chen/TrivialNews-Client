@@ -24,7 +24,7 @@ class RealmHelper{
             RealmConfiguration.Builder()
                     .name("user.realm")
                     .modules(UserModel())
-                    .schemaVersion(1)
+                    .schemaVersion(2)
                     .deleteRealmIfMigrationNeeded()
                     .build()
         }
@@ -33,7 +33,7 @@ class RealmHelper{
             RealmConfiguration.Builder()
                     .name("channels.realm")
                     .modules(ChannelModel())
-                    .schemaVersion(1)
+                    .schemaVersion(2)
                     .deleteRealmIfMigrationNeeded()
                     .build()
         }
