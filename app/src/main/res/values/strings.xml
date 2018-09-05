@@ -10,6 +10,8 @@
     <string name="main_timeline">时间轴</string>
     <string name="main_favorite">收藏</string>
     <string name="main_recommend">推荐</string>
+    <string name="main_drawer_open">打开侧边菜单</string>
+    <string name="main_drawer_close">关闭侧边菜单</string>
     <string name="login_register_title">用户登录</string>
     <string name="loading_more">正在加载更多</string>
     <string name="no_more">没有更多内容了</string>
@@ -44,4 +46,6 @@
     <string name="comment_add_failed">添加评论失败</string>
     <string name="detail_load_failed">加载新闻详情失败</string>
     <string name="detail_intent_activity_not_found">找不到打开连接的应用！</string>
+    <string name="drawer_manage_subscription">管理频道订阅</string>
+    <string name="drawer_logout">退出登录</string>
 </resources>

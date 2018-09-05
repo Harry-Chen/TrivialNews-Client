@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/drawer_manage_subscription"
+        android:title="@string/drawer_manage_subscription"
+        android:icon="@drawable/ic_subscriptions_black_24dp"/>
+
+    <item
+        android:id="@+id/drawer_logout"
+        android:title="@string/drawer_logout"
+        android:icon="@drawable/ic_logout_black_24dp"/>
+
+
+</menu>
