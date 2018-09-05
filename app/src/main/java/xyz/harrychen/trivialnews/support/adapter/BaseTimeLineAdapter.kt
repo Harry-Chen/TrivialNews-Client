@@ -32,6 +32,15 @@ class BaseTimelineAdapter(
         notifyItemRangeInserted(oldSize, news.size)
     }
 
+    fun deleteNews(position: Int) {
+        newsData.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
+    fun getNews(position: Int): News {
+        return newsData[position]
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsItemViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return NewsItemViewHolder(layoutInflater.inflate(

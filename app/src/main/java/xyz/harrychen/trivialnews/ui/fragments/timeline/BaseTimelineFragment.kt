@@ -41,7 +41,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
     protected var dataInvalidateAfterStop = false
 
     private lateinit var newsListView: View
-    private lateinit var timelineAdapter: BaseTimelineAdapter
+    protected lateinit var timelineAdapter: BaseTimelineAdapter
     private var snackBarPlace: CoordinatorLayout? = null
     private var fromCache = false
 
@@ -202,7 +202,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
         }
     }
 
-    private fun showSnack(content: Any) {
+    protected fun showSnack(content: Any) {
         if (snackBarPlace != null) {
             when (content) {
                 is Int -> snackbar(snackBarPlace!!, content)
@@ -211,7 +211,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
         }
     }
 
-    private fun showSnackWithFormat(id: Int, vararg args: Any?) {
+    protected fun showSnackWithFormat(id: Int, vararg args: Any?) {
         if (snackBarPlace != null && context != null) {
             showSnack(String.format(getString(id), *args))
         }

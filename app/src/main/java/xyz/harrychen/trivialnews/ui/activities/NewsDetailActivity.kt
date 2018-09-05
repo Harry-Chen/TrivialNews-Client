@@ -136,7 +136,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
                                         .equalTo("id", id).findFirst()!!)
                             }
 
-                            with(Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVORITE)) {
+                            with (Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVORITE)) {
                                 beginTransaction()
                                 insertOrUpdate(news!!)
                                 commitTransaction()
@@ -257,6 +257,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
                             commentAdapter.deleteItem(viewHolder.adapterPosition)
                             snackbar(detail_coordinator, R.string.comment_delete_success)
                         }, {
+                            commentAdapter.notifyDataSetChanged()
                             snackbar(detail_coordinator, R.string.comment_delete_failed)
                         })
                     }
