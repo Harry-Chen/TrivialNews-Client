@@ -30,7 +30,6 @@ class LoginActivity: AppCompatActivity() {
         checkToken()
         setTitle(R.string.login_register_title)
         setContentView(R.layout.activity_login)
-        fetchChannels()
         initForm()
     }
 
@@ -43,6 +42,8 @@ class LoginActivity: AppCompatActivity() {
             if (user != null) {
                 toast(R.string.auto_logged_in)
                 setTokenAndStartMain(user!!.token)
+            } else {
+                fetchChannels()
             }
         }
     }

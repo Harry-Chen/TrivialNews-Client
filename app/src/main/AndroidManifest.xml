@@ -16,18 +16,25 @@
 
         <activity
             android:name=".ui.activities.LoginActivity"
+            android:theme="@style/AppTheme.WithActionBar" />
+
+        <activity android:name=".ui.activities.MainActivity" />
+
+        <activity
+            android:name=".ui.activities.FilteredResultActivity"
+            android:theme="@style/AppTheme.WithActionBar" />
+
+        <activity android:name=".ui.activities.NewsDetailActivity" />
+
+        <activity
+            android:name=".ui.activities.SplashActivity"
             android:label="${launcherLabel}"
-            android:theme="@style/AppTheme.WithActionBar">
+            android:theme="@style/AppTheme.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".ui.activities.MainActivity" />
-        <activity android:name=".ui.activities.FilteredResultActivity"
-            android:theme="@style/AppTheme.WithActionBar"/>
-        <activity android:name=".ui.activities.NewsDetailActivity" />
 
     </application>
 
