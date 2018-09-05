@@ -1,5 +1,6 @@
 package xyz.harrychen.trivialnews.support.utils
 
+import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule
 import xyz.harrychen.trivialnews.models.Category
@@ -55,5 +56,19 @@ class RealmHelper{
                     .build()
         }
 
+        private fun deleteAllFromConfig(config: RealmConfiguration) {
+            with (Realm.getInstance(config)) {
+                beginTransaction()
+                deleteAll()
+                commitTransaction()
+            }
+        }
+
+        fun cleanUserData() {
+            deleteAllFromConfig(CONFIG_USER)
+            deleteAllFromConfig(CONFIG_CHANNELS)
+            deleteAllFromConfig(CONFIG_NEWS_TIMELINE)
+            deleteAllFromConfig(CONFIG_NEWS_FAVORITE)
+        }
     }
 }

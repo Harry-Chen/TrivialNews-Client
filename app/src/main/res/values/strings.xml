@@ -26,6 +26,7 @@
     <string name="menu_date_range">日期范围</string>
     <string name="adapter_author">作者： %s</string>
     <string name="adapter_statistics">%d 阅读 · %d 评论</string>
+    <string name="adapter_channel">来自：%s·%s</string>
     <string name="date_range_error">日期范围不合法！</string>
     <string name="news_detail_title">新闻详情</string>
     <string name="date_begin">开始日期</string>
@@ -48,4 +49,6 @@
     <string name="detail_intent_activity_not_found">找不到打开连接的应用！</string>
     <string name="drawer_manage_subscription">管理频道订阅</string>
     <string name="drawer_logout">退出登录</string>
+    <string name="login_fetch_channel_failed">获取频道列表失败</string>
+    <string name="login_fetch_channel_success">获取频道列表成功</string>
 </resources>

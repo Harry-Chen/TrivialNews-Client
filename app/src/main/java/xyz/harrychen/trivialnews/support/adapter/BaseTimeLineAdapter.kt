@@ -5,24 +5,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
+import io.realm.Realm
 import kotlinx.android.synthetic.main.news_list_item.view.*
 import xyz.harrychen.trivialnews.R
+import xyz.harrychen.trivialnews.models.Category
 import xyz.harrychen.trivialnews.models.News
+import xyz.harrychen.trivialnews.support.utils.ChannelLookup
+import xyz.harrychen.trivialnews.support.utils.RealmHelper
 import xyz.harrychen.trivialnews.support.utils.toReadableDateTimeString
 
-typealias OnNewsClickHandler = (news: News) -> Unit
 
 class BaseTimelineAdapter(
     private var newsData: MutableList<News> = MutableList(0) {News()},
-    private var newsClickHandler: OnNewsClickHandler
+    private var newsClickHandler: (news: News) -> Unit
 ) : RecyclerView.Adapter<BaseTimelineAdapter.NewsItemViewHolder>() {
 
 
     fun setNews(news: Collection<News>) {
-        // val oldSize = newsData.size
-        // notifyItemRangeRemoved(0, oldSize)
         newsData = news.toMutableList()
-        // notifyItemRangeInserted(0,  newsData.size)
         notifyDataSetChanged()
     }
 
@@ -55,13 +55,19 @@ class BaseTimelineAdapter(
 
 
     inner class NewsItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+
         fun bind(item: News, position: Int): Unit = with(view) {
+
+            val channelInfo = ChannelLookup.getChannelName(item.channelId)
+
             news_item_title.text = item.title
             news_item_summary.text = item.summary
-            news_item_channel.text = "频道编号：${item.channelId}"
+            news_item_channel.text = context.getString(R.string.adapter_channel)
+                    .format(channelInfo.first, channelInfo.second)
             news_item_date.text = item.publishDate.toReadableDateTimeString()
             news_item_author.text = context.getString(R.string.adapter_author).format(item.author)
-            news_item_statistics.text = context.getString(R.string.adapter_statistics).format(item.readNum, item.commentNum)
+            news_item_statistics.text = context.getString(R.string.adapter_statistics)
+                    .format(item.readNum, item.commentNum)
 
             news_item_shadow.visibility = if (item.hasRead) View.VISIBLE else View.INVISIBLE
 

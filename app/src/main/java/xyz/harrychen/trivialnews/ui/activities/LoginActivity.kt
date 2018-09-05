@@ -18,7 +18,9 @@ import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.QueryParameter
 import xyz.harrychen.trivialnews.models.User
 import xyz.harrychen.trivialnews.support.api.BaseApi
+import xyz.harrychen.trivialnews.support.api.ChannelApi
 import xyz.harrychen.trivialnews.support.api.UserApi
+import xyz.harrychen.trivialnews.support.utils.ChannelLookup
 import xyz.harrychen.trivialnews.support.utils.RealmHelper
 
 class LoginActivity: AppCompatActivity() {
@@ -33,25 +35,25 @@ class LoginActivity: AppCompatActivity() {
 
 
     private fun checkToken() {
-        doAsync {
-            var token: User? = null
-            with (Realm.getInstance(RealmHelper.CONFIG_USER)) {
-                token = this.where(User::class.java).equalTo("id", 0 as Int).findFirst()
-                if (token != null) {
-                    token = copyFromRealm(token!!)
-                }
-            }
-            uiThread {
-                if (token != null) {
-                    toast(R.string.auto_logged_in)
-                    setTokenAndStartMain(token!!.token)
-                }
+
+        var token: User? = null
+        with (Realm.getInstance(RealmHelper.CONFIG_USER)) {
+            token = this.where(User::class.java).equalTo("id", 0 as Int).findFirst()
+            if (token != null) {
+                token = copyFromRealm(token!!)
             }
         }
+
+        if (token != null) {
+            toast(R.string.auto_logged_in)
+            setTokenAndStartMain(token!!.token)
+        }
+
     }
 
     private fun setTokenAndStartMain(token: String) {
         BaseApi.setToken(token)
+        fetchChannels()
         startActivity<MainActivity>()
         this.finish()
     }
@@ -89,15 +91,33 @@ class LoginActivity: AppCompatActivity() {
 
     }
 
+
+    private fun fetchChannels() {
+        ChannelApi.getChannelList().subscribe({
+
+            with (Realm.getInstance(RealmHelper.CONFIG_CHANNELS)) {
+                beginTransaction()
+                deleteAll()
+                copyToRealm(it)
+                commitTransaction()
+                ChannelLookup.updateChannelInfo(it)
+            }
+
+            toast(R.string.login_fetch_channel_success)
+        }, {
+            toast(R.string.login_fetch_channel_failed)
+        })
+    }
+
+
     private fun loginOrRegister(parameter: QueryParameter.Register) {
         UserApi.loginOrRegister(parameter).subscribe({token ->
 
             doAsync {
                 with (Realm.getInstance(RealmHelper.CONFIG_USER)) {
                     beginTransaction()
-                    copyToRealm(xyz.harrychen.trivialnews.models.User(
-                            username = input_username.text.toString(),
-                            token = token.token))
+                    copyToRealm(User(username = input_username.text.toString()
+                            , token = token.token))
                     commitTransaction()
                 }
             }

@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.main_content.*
 import org.jetbrains.anko.*
 import org.joda.time.LocalDate
 import xyz.harrychen.trivialnews.R
+import xyz.harrychen.trivialnews.support.utils.RealmHelper
 import xyz.harrychen.trivialnews.ui.fragments.timeline.BaseTimelineFragment
 import xyz.harrychen.trivialnews.ui.fragments.timeline.FavoriteFragment
 import xyz.harrychen.trivialnews.ui.fragments.timeline.MainTimelineFragment
@@ -26,19 +27,13 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
     private var nowFragmentId = -1
     private var fragments: HashMap<Int, BaseTimelineFragment> = HashMap()
+    private var menu: Menu? = null
 
     private fun initNavigation() {
 
         main_navigation.setOnNavigationItemSelectedListener {
             if (it.itemId != nowFragmentId) {
-                var fragment = fragments[it.itemId]
-                if (fragment == null) {
-                    fragment = createFragment(it.itemId)
-                    fragment!!.setCoordinatorLayout(main_coordinator)
-                }
-                fragments[it.itemId] = fragment
-                supportFragmentManager.beginTransaction().replace(R.id.main_frame, fragment).commit()
-
+                switchToFragment(it.itemId)
             } else {
                 fragments[it.itemId]!!.scrollAndRefresh()
 
@@ -52,6 +47,17 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
     }
 
 
+    private fun switchToFragment(id: Int) {
+        var fragment = fragments[id]
+        if (fragment == null) {
+            fragment = createFragment(id)
+            fragment!!.setCoordinatorLayout(main_coordinator)
+        }
+        fragments[id] = fragment
+        supportFragmentManager.beginTransaction().replace(R.id.main_frame, fragment).commit()
+    }
+
+
     private fun initDrawer() {
 
         val toggle = ActionBarDrawerToggle(this,
@@ -62,8 +68,14 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
         main_drawer_navigation.setNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.drawer_manage_subscription -> Unit
-                R.id.drawer_logout -> Unit
+                R.id.drawer_manage_subscription -> {
+
+                }
+                R.id.drawer_logout -> {
+                    RealmHelper.cleanUserData()
+                    startActivity<LoginActivity>()
+                    finish()
+                }
             }
             true
         }
@@ -105,6 +117,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_toolbar, menu)
+        this.menu = menu
         main_search.setMenuItem(menu.findItem(R.id.action_search))
         menu.findItem(R.id.action_range).setOnMenuItemClickListener {
             showDateChooserDialog()
