@@ -98,9 +98,9 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
                                     year: Int, month: Int, day: Int,
                                     yearEnd: Int, monthEnd: Int, dayEnd: Int ->
         val begin = LocalDate(year, month + 1, day)
-                .toDateTimeAtStartOfDay(LOCAL_TIME_ZONE)
+                .toDateTimeAtStartOfDay()
         val end = LocalDate(yearEnd, monthEnd + 1, dayEnd)
-                .toDateTimeAtStartOfDay(LOCAL_TIME_ZONE)
+                .toDateTimeAtStartOfDay()
         if (!end.isBefore(begin)) {
             startActivity<FilteredResultActivity>("type" to "range",
                     "beforeDate" to end, "afterDate" to begin)

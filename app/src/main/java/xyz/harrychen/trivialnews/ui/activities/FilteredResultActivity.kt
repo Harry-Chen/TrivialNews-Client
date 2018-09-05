@@ -43,10 +43,11 @@ class FilteredResultActivity : AppCompatActivity() {
                     title = getString(R.string.range_result_title)
                             .format(formatter.print(afterDate), formatter.print(beforeDate))
 
-                    val realBeforeDate = beforeDate.plusDays(1) // API format is [startDate, endDate)
+                    // API format is [startDate, endDate)
+                    val realBeforeDate = beforeDate.plusDays(1)
 
-                    bundle.putString("beforeDate", BaseApi.dateTimeFormatter.print(realBeforeDate))
-                    bundle.putString("afterDate", BaseApi.dateTimeFormatter.print(afterDate))
+                    bundle.putString("beforeDate", realBeforeDate.toString())
+                    bundle.putString("afterDate", afterDate.toString())
                     fragment = RangeTimelineFragment()
                 }
             }

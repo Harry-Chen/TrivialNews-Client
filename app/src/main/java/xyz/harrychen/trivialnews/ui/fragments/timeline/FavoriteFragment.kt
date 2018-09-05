@@ -11,6 +11,7 @@ class FavoriteFragment: BaseTimelineFragment() {
         realmConfig = RealmHelper.CONFIG_NEWS_FAVORITE
         infiniteScroll = false
         needNetwork = false
+        dataInvalidateAfterStop = true
     }
 
     override fun loadFromNetwork(page: Int): Single<List<News>> = NewsApi.getFavoriteNews()

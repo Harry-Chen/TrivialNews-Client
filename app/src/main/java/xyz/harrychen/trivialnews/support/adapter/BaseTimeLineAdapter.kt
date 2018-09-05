@@ -6,11 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.news_list_item.view.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.joda.time.LocalDateTime
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.News
-import xyz.harrychen.trivialnews.support.api.BaseApi
+import xyz.harrychen.trivialnews.support.utils.toReadableDateTimeString
 
 typealias OnNewsClickHandler = (news: News) -> Unit
 
@@ -52,7 +50,7 @@ class BaseTimelineAdapter(
             news_item_title.text = item.title
             news_item_summary.text = item.summary
             news_item_channel.text = "频道编号：${item.channelId}"
-            news_item_date.text = BaseApi.dateTimeFormatter.print(LocalDateTime(item.publishDate))
+            news_item_date.text = item.publishDate.toReadableDateTimeString()
             news_item_author.text = context.getString(R.string.adapter_author).format(item.author)
             news_item_statistics.text = context.getString(R.string.adapter_statistics).format(item.readNum, item.commentNum)
 

@@ -37,6 +37,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
     protected var infiniteScroll = true
     protected var canRefresh = true
     protected var needNetwork = true
+    protected var dataInvalidateAfterStop = false
 
     private lateinit var newsListView: View
     private lateinit var timelineAdapter: BaseTimelineAdapter
@@ -64,6 +65,14 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
         if (needNetwork) refreshTimeline()
 
         return newsListView
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+        if (dataInvalidateAfterStop) {
+            loadFromCache()
+        }
     }
 
 
@@ -103,7 +112,9 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
             uiThread {
                 timelineAdapter.setNews(cachedNews)
                 fromCache = true
-                showSnack(getString(R.string.load_more_news_cache).format(cachedNews.size))
+                if (context != null) {
+                    showSnack(getString(R.string.load_more_news_cache).format(cachedNews.size))
+                }
             }
         }
 
@@ -197,6 +208,13 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
         }
     }
 
+    private fun showSnackWithFormat(id: Int, vararg args: Any) {
+        if (snackBarPlace != null && context != null) {
+            showSnack(getString(id).format(args))
+        }
+    }
+
+
     private fun refreshTimeline() {
         currentPage = 0
         newsListView.swipe_refresh.isRefreshing = true
@@ -206,7 +224,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
                 fromCache = false
                 timelineAdapter.setNews(news)
                 appendToCache(news)
-                showSnack(getString(R.string.load_more_news).format(news.size))
+                showSnackWithFormat(R.string.load_more_news, news.size)
             newsListView.swipe_refresh.isRefreshing = false
         }, {
             newsListView.swipe_refresh.isRefreshing = false
@@ -222,7 +240,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
                 currentPage++
                 timelineAdapter.addNews(news)
                 appendToCache(news)
-                showSnack(getString(R.string.load_more_news).format(news.size))
+                showSnackWithFormat(R.string.load_more_news, news.size)
             } else {
                 showSnack(R.string.no_more)
             }

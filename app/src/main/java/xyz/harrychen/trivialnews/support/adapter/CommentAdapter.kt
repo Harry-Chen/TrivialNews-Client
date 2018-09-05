@@ -5,10 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.comment_item.view.*
-import org.joda.time.LocalDateTime
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.Comment
-import xyz.harrychen.trivialnews.support.api.BaseApi
+import xyz.harrychen.trivialnews.support.utils.toReadableDateTimeString
 
 
 class CommentAdapter(
@@ -45,7 +44,7 @@ class CommentAdapter(
     inner class CommentViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         fun bind(item: Comment, position: Int): Unit = with(view) {
             comment_author.text = context.getString(R.string.comment_author).format(item.username)
-            comment_time.text = BaseApi.dateTimeFormatter.print(LocalDateTime(item.time))
+            comment_time.text = item.time.toReadableDateTimeString()
             comment_content.text = item.content
         }
     }

@@ -2,9 +2,7 @@
 
 package xyz.harrychen.trivialnews.support
 
-import org.joda.time.DateTimeZone
 
 const val API_BASE_URL = "https://news.harrychen.xyz:5001/"
 const val NEWS_PER_LOAD = 20
 const val BAIKE_URI_PREFIX = "https://baike.baidu.com/item/"
-val LOCAL_TIME_ZONE = DateTimeZone.forID( "Asia/Shanghai" )!!

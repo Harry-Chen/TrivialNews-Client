@@ -20,6 +20,8 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import xyz.harrychen.trivialnews.support.API_BASE_URL
 import xyz.harrychen.trivialnews.support.utils.ApiException
+import xyz.harrychen.trivialnews.support.utils.DateUtils
+import xyz.harrychen.trivialnews.support.utils.toISO8601String
 import java.lang.reflect.Type
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -75,14 +77,6 @@ interface BaseApi {
 
         private var RETROFIT: Retrofit? = null
 
-        val dateTimeFormatter: DateTimeFormatter by lazy {
-            ISODateTimeFormat.dateTime()
-        }
-
-        val dateTimeParser: DateTimeFormatter by lazy {
-            ISODateTimeFormat.dateTimeParser()
-        }
-
         private val GSON by lazy {
             GsonBuilder()
                     .setExclusionStrategies(object : ExclusionStrategy {
@@ -95,14 +89,13 @@ interface BaseApi {
                         }
                     })
                     .registerTypeAdapter(Date::class.java,
-                            JsonDeserializer<Date> { json: JsonElement?, _: Type?, _: JsonDeserializationContext? ->
-                                val dateString = json!!.asString
-                                val datetime = dateTimeParser.parseDateTime(dateString)
-                                datetime.toLocalDateTime().toDate()
+                            JsonDeserializer<Date> { json: JsonElement?,
+                                                     _: Type?, _: JsonDeserializationContext? ->
+                                DateUtils.fromISO8601String(json!!.asString)
                             })
                     .registerTypeAdapter(Date::class.java,
                             JsonSerializer<Date> { src: Date?, _: Type?, _: JsonSerializationContext? ->
-                                JsonPrimitive(dateTimeFormatter.print(LocalDateTime(src)))
+                                JsonPrimitive(src!!.toISO8601String())
                             })
                     .create()
         }

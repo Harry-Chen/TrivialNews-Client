@@ -3,7 +3,6 @@ package xyz.harrychen.trivialnews.ui.activities
 import android.arch.lifecycle.Lifecycle
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.webkit.WebView
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.trello.rxlifecycle2.android.lifecycle.kotlin.bindUntilEvent
@@ -64,11 +63,14 @@ class LoginActivity: AppCompatActivity() {
 
     private fun initForm() {
 
-        val inputChecker = Observable.combineLatest(input_username.textChanges(), input_password.textChanges(),
+        val inputChecker = Observable.combineLatest(input_username.textChanges(),
+                input_password.textChanges(),
                 BiFunction<CharSequence, CharSequence, Boolean>{
                     username: CharSequence, password: CharSequence ->
-                    val usernameValid = !username.isBlank() && !username.contains(Regex("\\s+"))
-                    val passwordValid = !password.isBlank() && !password.contains(Regex("\\s+"))
+                    val usernameValid = !username.isBlank() &&
+                            !username.contains(Regex("\\s+"))
+                    val passwordValid = !password.isBlank() &&
+                            !password.contains(Regex("\\s+"))
                     usernameValid && passwordValid
                 }).bindUntilEvent(this, Lifecycle.Event.ON_DESTROY)
         inputChecker.subscribe(setButtonState)
@@ -93,7 +95,9 @@ class LoginActivity: AppCompatActivity() {
             doAsync {
                 with (Realm.getInstance(RealmHelper.CONFIG_USER)) {
                     beginTransaction()
-                    copyToRealm(xyz.harrychen.trivialnews.models.User(username = input_username.text.toString(), token = token.token))
+                    copyToRealm(xyz.harrychen.trivialnews.models.User(
+                            username = input_username.text.toString(),
+                            token = token.token))
                     commitTransaction()
                 }
             }
