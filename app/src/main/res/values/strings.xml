@@ -42,4 +42,6 @@
     <string name="comment_delete_failed">删除评论失败</string>
     <string name="comment_add_success">添加评论成功</string>
     <string name="comment_add_failed">添加评论失败</string>
+    <string name="detail_load_failed">加载新闻详情失败</string>
+    <string name="detail_intent_activity_not_found">找不到打开连接的应用！</string>
 </resources>

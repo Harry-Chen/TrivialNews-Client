@@ -14,7 +14,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.*
 import org.joda.time.LocalDate
 import xyz.harrychen.trivialnews.R
-import xyz.harrychen.trivialnews.support.LOCAL_TIME_ZONE
 import xyz.harrychen.trivialnews.ui.fragments.timeline.BaseTimelineFragment
 import xyz.harrychen.trivialnews.ui.fragments.timeline.FavoriteFragment
 import xyz.harrychen.trivialnews.ui.fragments.timeline.MainTimelineFragment

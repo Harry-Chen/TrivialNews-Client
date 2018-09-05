@@ -26,6 +26,7 @@ import org.jetbrains.anko.support.v4.startActivity
 import org.jetbrains.anko.uiThread
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.News
+import xyz.harrychen.trivialnews.support.NEWS_PER_PAGE
 import xyz.harrychen.trivialnews.support.adapter.BaseTimelineAdapter
 import xyz.harrychen.trivialnews.ui.activities.NewsDetailActivity
 
@@ -112,8 +113,9 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
             uiThread {
                 timelineAdapter.setNews(cachedNews)
                 fromCache = true
+                currentPage = if (cachedNews.isEmpty()) 0 else (cachedNews.size - 1) / NEWS_PER_PAGE
                 if (context != null) {
-                    showSnack(getString(R.string.load_more_news_cache).format(cachedNews.size))
+                    showSnackWithFormat(R.string.load_more_news_cache, cachedNews.size)
                 }
             }
         }
@@ -145,6 +147,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
         }
 
     }
+
 
     private var isLoading: Boolean = false
         set(loading) {
@@ -188,7 +191,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
                                 && !isLoading
                                 && lastItem == manager.itemCount - 1
                                 && event.dy() > 0) {
-                            if (fromCache || !infiniteScroll) {
+                            if (!infiniteScroll) {
                                 showSnack(R.string.infinite_scroll_disabled)
                             } else {
                                 isLoading = true
@@ -208,9 +211,9 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
         }
     }
 
-    private fun showSnackWithFormat(id: Int, vararg args: Any) {
+    private fun showSnackWithFormat(id: Int, vararg args: Any?) {
         if (snackBarPlace != null && context != null) {
-            showSnack(getString(id).format(args))
+            showSnack(String.format(getString(id), *args))
         }
     }
 

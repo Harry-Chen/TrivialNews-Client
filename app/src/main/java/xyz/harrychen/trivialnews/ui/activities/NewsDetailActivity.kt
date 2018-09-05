@@ -1,6 +1,7 @@
 package xyz.harrychen.trivialnews.ui.activities
 
 import android.arch.lifecycle.Lifecycle
+import android.content.ActivityNotFoundException
 import android.net.Uri
 import android.os.Bundle
 import android.support.customtabs.CustomTabsIntent
@@ -69,6 +70,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_news_detail)
+
         setupToolbar()
 
         with (intent.extras!!) {
@@ -113,6 +115,10 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         }
         title = getString(R.string.news_detail_title)
 
+        handleFavoriteChange()
+    }
+
+    private fun handleFavoriteChange() {
 
         detail_favorite_button.setAnimateFavorite(true)
         detail_favorite_button.setAnimateUnfavorite(true)
@@ -162,7 +168,6 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         }
     }
 
-
     private fun setupPostComment() {
         comment_input.textChanges().bindUntilEvent(this, Lifecycle.Event.ON_DESTROY)
                 .subscribe{ comment_submit.isEnabled = it.isNotBlank() }
@@ -194,14 +199,28 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
     }
 
 
+    private fun markCachedNewsAsRead() {
+        doAsync {
+            with (Realm.getInstance(RealmHelper.CONFIG_NEWS_TIMELINE)) {
+                beginTransaction()
+                where(News::class.java).equalTo("id", id)
+                        .findFirst()!!.hasRead = true
+                commitTransaction()
+            }
+        }
+    }
+
+
     private fun loadNewsDetails() {
         NewsApi.getNewsDetail(id).bindUntilEvent(this, Lifecycle.Event.ON_STOP)
                 .subscribe({
                     detail_favorite_button.setFavoriteSuppressListener(it.favorite)
                     setKeywords(it.keywords)
                     loadComments(it.comments)
+                    setOnSwipeHandler()
+                    markCachedNewsAsRead()
                 }, {
-                    throw(it)
+                    snackbar(detail_coordinator, R.string.detail_load_failed)
                 })
     }
 
@@ -211,23 +230,19 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
             val chip = Chip(this)
             chip.text = it
             chip.onClick {
-                netIntent.launchUrl(this@NewsDetailActivity,
-                        Uri.parse("$BAIKE_URI_PREFIX${chip.text}"))
+                try {
+                    netIntent.launchUrl(this@NewsDetailActivity,
+                            Uri.parse("$BAIKE_URI_PREFIX${chip.text}"))
+                } catch (e: ActivityNotFoundException) {
+                    snackbar(detail_coordinator, R.string.detail_intent_activity_not_found)
+                }
             }
             detail_keyword_chips.addView(chip)
         }
     }
 
 
-    private fun loadComments(comments: List<Comment>) {
-        commentsNum= comments.size
-
-        commentAdapter = CommentAdapter(comments.toMutableList())
-        with (detail_comment_list) {
-            itemAnimator = LandingAnimator()
-            layoutManager = LinearLayoutManager(this.context)
-            adapter = ScaleInAnimationAdapter(commentAdapter)
-        }
+    private fun setOnSwipeHandler() {
 
         val swipeHandler = object:SwipeToDeleteCallback(this, {
             commentAdapter.getItem(it).username == currentUser.username
@@ -253,6 +268,18 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         }
 
         ItemTouchHelper(swipeHandler).attachToRecyclerView(detail_comment_list)
+    }
+
+
+    private fun loadComments(comments: List<Comment>) {
+        commentsNum= comments.size
+
+        commentAdapter = CommentAdapter(comments.toMutableList())
+        with (detail_comment_list) {
+            itemAnimator = LandingAnimator()
+            layoutManager = LinearLayoutManager(this.context)
+            adapter = ScaleInAnimationAdapter(commentAdapter)
+        }
 
     }
 

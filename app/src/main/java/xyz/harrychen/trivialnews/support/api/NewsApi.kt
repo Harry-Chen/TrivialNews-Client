@@ -4,7 +4,7 @@ import io.reactivex.Single
 import retrofit2.http.*
 import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.models.NewsDetail
-import xyz.harrychen.trivialnews.support.NEWS_PER_LOAD
+import xyz.harrychen.trivialnews.support.NEWS_PER_PAGE
 
 interface NewsApi {
 
@@ -15,7 +15,7 @@ interface NewsApi {
                         @Query("after_time") afterTime: String? = null,
                         @Query("query") query: String? = null,
                         @Query("page") page: Int,
-                        @Query("count") count: Int = NEWS_PER_LOAD)
+                        @Query("count") count: Int = NEWS_PER_PAGE)
             : Single<List<News>>
 
 

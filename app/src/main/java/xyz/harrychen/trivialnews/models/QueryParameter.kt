@@ -1,7 +1,7 @@
 package xyz.harrychen.trivialnews.models
 
 import com.google.gson.annotations.SerializedName
-import xyz.harrychen.trivialnews.support.NEWS_PER_LOAD
+import xyz.harrychen.trivialnews.support.NEWS_PER_PAGE
 import java.util.*
 
 object QueryParameter {
@@ -35,7 +35,7 @@ object QueryParameter {
             @SerializedName("after_time") val afterTime: Date? = null,
             val query: String? = null,
             val page: Int,
-            val count: Int = NEWS_PER_LOAD
+            val count: Int = NEWS_PER_PAGE
     )
 
 
