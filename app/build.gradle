@@ -40,6 +40,7 @@ android {
             manifestPlaceholders = [
                     launcherLabel: "@string/app_name"
             ]
+            versionNameSuffix "-normal"
         }
 
         thu {
@@ -48,6 +49,7 @@ android {
             manifestPlaceholders = [
                     launcherLabel: "陈晟祺_News"
             ]
+            versionNameSuffix "-thu"
         }
     }
 
