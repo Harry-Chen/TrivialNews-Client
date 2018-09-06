@@ -5,7 +5,7 @@
     android:id="@+id/main_coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="xyz.harrychen.trivialnews.ui.activities.MainActivity">
+    tools:context=".ui.activities.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/main_appbar"
@@ -63,6 +63,6 @@
         android:background="?android:attr/windowBackground"
         app:menu="@menu/main_navigation"
         app:layout_insetEdge="bottom"
-        app:layout_behavior=".support.utils.BottomNavigationBarBehavior"/>
+        app:layout_behavior="xyz.harrychen.trivialnews.support.utils.BottomNavigationBarBehavior"/>
 
 </android.support.design.widget.CoordinatorLayout>
