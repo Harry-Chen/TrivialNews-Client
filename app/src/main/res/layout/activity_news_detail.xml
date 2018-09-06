@@ -25,32 +25,30 @@
         android:layout_height="wrap_content"
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
 
-        <FrameLayout
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/detail_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
             app:layout_scrollFlags="scroll|enterAlways">
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/detail_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
             <com.github.ivbaranov.mfb.MaterialFavoriteButton
                 android:id="@+id/detail_favorite_button"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 app:mfb_animate_favorite="true"
                 app:mfb_animate_unfavorite="true"
                 app:mfb_color="white"
                 app:mfb_type="star"
                 app:mfb_rotation_duration="400"
                 app:mfb_rotation_angle="360"
-                android:layout_gravity="center_vertical|end"/>
+                android:layout_gravity="center_vertical"/>
 
-        </FrameLayout>
+        </android.support.v7.widget.Toolbar>
+
 
     </android.support.design.widget.AppBarLayout>
 

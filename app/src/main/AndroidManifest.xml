@@ -39,6 +39,16 @@
         <activity android:name=".ui.activities.ChannelActivity"
             android:theme="@style/AppTheme.WithActionBar"/>
 
+        <provider
+            android:authorities="${applicationId}.glide"
+            android:name="android.support.v4.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_glide" />
+        </provider>
+
     </application>
 
 </manifest>

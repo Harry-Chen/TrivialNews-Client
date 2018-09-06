@@ -3,6 +3,7 @@ package xyz.harrychen.trivialnews.models
 import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
+import java.io.Serializable
 import java.util.*
 
 open class News(
@@ -26,4 +27,4 @@ open class News(
         var picture: String = "",
         @SerializedName("has_read")
         var hasRead: Boolean = false
-) : RealmObject()
+) : RealmObject(), Serializable

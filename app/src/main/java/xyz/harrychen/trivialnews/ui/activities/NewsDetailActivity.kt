@@ -2,16 +2,22 @@ package xyz.harrychen.trivialnews.ui.activities
 
 import android.arch.lifecycle.Lifecycle
 import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.customtabs.CustomTabsIntent
 import android.support.design.chip.Chip
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.FileProvider
+import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.ShareActionProvider
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.view.Menu
 import android.view.View
+import com.bumptech.glide.Glide
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
@@ -23,7 +29,7 @@ import kotlinx.android.synthetic.main.activity_news_detail.*
 import kotlinx.android.synthetic.main.news_detail_comment.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.design.snackbar
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import xyz.harrychen.trivialnews.BuildConfig
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.Comment
 import xyz.harrychen.trivialnews.models.News
@@ -35,14 +41,15 @@ import xyz.harrychen.trivialnews.support.api.NewsApi
 import xyz.harrychen.trivialnews.support.api.UserApi
 import xyz.harrychen.trivialnews.support.utils.RealmHelper
 import xyz.harrychen.trivialnews.support.utils.SwipeToDeleteCallback
+import xyz.harrychen.trivialnews.support.utils.toReadableDateTimeString
 import xyz.harrychen.trivialnews.ui.fragments.WebViewFragment
 
 class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
 
-    private var id: Int = 0
-    private lateinit var link: String
+    private lateinit var newsToShow: News
     private lateinit var commentAdapter: CommentAdapter
+    private var mShareActionProvider: ShareActionProvider? = null
 
     private var commentsNum: Int = 0
     set(value) {
@@ -63,7 +70,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
     private val netIntent by lazy {
         CustomTabsIntent.Builder()
                 .setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                .setSecondaryToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                .setSecondaryToolbarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
                 .build()
     }
 
@@ -74,8 +81,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         setupToolbar()
 
         with (intent.extras!!) {
-            id = this["id"] as Int
-            link = (this["link"] as String).replace("http://", "https://")
+            newsToShow = this["news"] as News
         }
 
         setupSlidePanel()
@@ -84,6 +90,70 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         loadNewsDetails()
 
     }
+
+
+
+    private fun getPictureUri(url: String): Uri {
+        val result = doAsyncResult {
+            Glide.with(this@NewsDetailActivity).downloadOnly().load(url)
+                    .submit().get()
+        }
+
+        return FileProvider.getUriForFile(this,
+                BuildConfig.APPLICATION_ID + ".glide", result.get())
+    }
+
+
+    private fun setShareIntent() {
+
+        doAsync {
+
+            val shareIntent = Intent(Intent.ACTION_SEND)
+
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, newsToShow.title)
+            shareIntent.putExtra(Intent.EXTRA_TITLE, newsToShow.title)
+
+            val shareContent = getString(R.string.share_format)
+                    .format(newsToShow.title, newsToShow.summary,
+                            newsToShow.publishDate.toReadableDateTimeString(),
+                            newsToShow.author, newsToShow.link)
+
+            shareIntent.putExtra(Intent.EXTRA_TEXT, shareContent)
+            // System SMS
+            shareIntent.putExtra("sms_body", shareContent)
+            // WeChat < 6.6.7
+            shareIntent.putExtra("Kdescription", shareContent)
+
+
+            when (newsToShow.picture.isNotBlank()) {
+                false -> shareIntent.type = "text/plain"
+                true -> {
+                    shareIntent.type = "image/jpg,text/plain"
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, getPictureUri(newsToShow.picture))
+                }
+            }
+
+            uiThread {
+                mShareActionProvider?.setShareIntent(shareIntent)
+                invalidateOptionsMenu()
+            }
+
+        }
+    }
+
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.detail_toolbar, menu)
+
+        menu.findItem(R.id.detail_menu_share).also {
+            mShareActionProvider = MenuItemCompat.getActionProvider(it) as ShareActionProvider
+        }
+
+        return true
+    }
+
+
+
 
 
     private fun setupSlidePanel() {
@@ -117,6 +187,8 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
         handleFavoriteChange()
     }
+    
+
 
     private fun handleFavoriteChange() {
 
@@ -126,14 +198,14 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         detail_favorite_button.setOnFavoriteChangeListener { _, favorite ->
             when (favorite) {
                 true -> {
-                    UserApi.addFavoriteNews(listOf(id)).subscribe({
+                    UserApi.addFavoriteNews(listOf(newsToShow.id)).subscribe({
                         snackbar(detail_coordinator, R.string.add_favorite_success)
                         doAsync {
                             var news: News? = null
 
                             Realm.getInstance(RealmHelper.CONFIG_NEWS_TIMELINE).use {
                                 news = it.copyFromRealm(it.where(News::class.java)
-                                        .equalTo("id", id).findFirst()!!)
+                                        .equalTo("id", newsToShow.id).findFirst()!!)
                             }
 
                             Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVORITE).use {
@@ -149,12 +221,12 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
                 }
                 false -> {
-                    UserApi.deleteFavoriteNews(listOf(id)).subscribe({
+                    UserApi.deleteFavoriteNews(listOf(newsToShow.id)).subscribe({
                         snackbar(detail_coordinator, R.string.delete_favorite_success)
                         doAsync {
                             Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVORITE).use {
                                 it.beginTransaction()
-                                it.where(News::class.java).equalTo("id", id)
+                                it.where(News::class.java).equalTo("id", newsToShow.id)
                                         .findAll().deleteAllFromRealm()
                                 it.commitTransaction()
                             }
@@ -173,7 +245,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
                 .subscribe{ comment_submit.isEnabled = it.isNotBlank() }
 
         comment_submit.clicks().bindUntilEvent(this, Lifecycle.Event.ON_DESTROY).subscribe{
-            CommentApi.addComment(id, comment_input.text.toString().trim())
+            CommentApi.addComment(newsToShow.id, comment_input.text.toString().trim())
                     .subscribe({
                         commentsNum++
                         commentAdapter.addItem(it)
@@ -190,7 +262,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
         val webFragment = WebViewFragment()
         val bundle = Bundle()
-        bundle.putString("link", link)
+        bundle.putString("link", newsToShow.link)
         webFragment.arguments = bundle
 
         supportFragmentManager.beginTransaction()
@@ -205,7 +277,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         doAsync {
             Realm.getInstance(RealmHelper.CONFIG_NEWS_TIMELINE).use {
                 it.beginTransaction()
-                it.where(News::class.java).equalTo("id", id)
+                it.where(News::class.java).equalTo("id", newsToShow.id)
                         .findFirst()!!.hasRead = true
                 it.commitTransaction()
             }
@@ -214,13 +286,14 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
 
     private fun loadNewsDetails() {
-        NewsApi.getNewsDetail(id).bindUntilEvent(this, Lifecycle.Event.ON_STOP)
+        NewsApi.getNewsDetail(newsToShow.id).bindUntilEvent(this, Lifecycle.Event.ON_STOP)
                 .subscribe({
                     detail_favorite_button.setFavoriteSuppressListener(it.favorite)
                     setKeywords(it.keywords)
                     loadComments(it.comments)
                     setOnSwipeHandler()
                     markCachedNewsAsRead()
+                    setShareIntent()
                 }, {
                     snackbar(detail_coordinator, R.string.detail_load_failed)
                 })
@@ -231,7 +304,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         keywords.forEach {
             val chip = Chip(this)
             chip.text = it
-            chip.onClick {
+            chip.setOnClickListener {
                 try {
                     netIntent.launchUrl(this@NewsDetailActivity,
                             Uri.parse("$BAIKE_URI_PREFIX${chip.text}"))

@@ -46,7 +46,7 @@
     <string name="comment_add_success">添加评论成功</string>
     <string name="comment_add_failed">添加评论失败</string>
     <string name="detail_load_failed">加载新闻详情失败</string>
-    <string name="detail_intent_activity_not_found">找不到打开连接的应用！</string>
+    <string name="detail_intent_activity_not_found">找不到打开链接的应用</string>
     <string name="drawer_manage_subscription">管理频道订阅</string>
     <string name="drawer_logout">退出登录</string>
     <string name="login_fetch_channel_failed">获取频道列表失败</string>
@@ -56,4 +56,6 @@
     <string name="toggle_subscription_status_success">更改订阅状态成功</string>
     <string name="toggle_subscription_status_failed">更改订阅状态失败</string>
     <string name="external_website_warning">新闻详情为外部网页，可能显示不正常，敬请谅解</string>
+    <string name="detail_action_share">分享</string>
+    <string name="share_format">标题：%s\n摘要：%s\n发布时间：%s\n作者：%s\n正文链接：%s\n来自 Trivial News</string>
 </resources>

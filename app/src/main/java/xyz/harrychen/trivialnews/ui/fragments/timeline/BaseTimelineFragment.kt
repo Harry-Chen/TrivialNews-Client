@@ -50,7 +50,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
                               savedInstanceState: Bundle?): View? {
         newsListView = inflater.inflate(R.layout.refreshable_timeline, container, false)
         timelineAdapter = BaseTimelineAdapter {
-            startActivity<NewsDetailActivity>("id" to it.id, "link" to it.link)
+            startActivity<NewsDetailActivity>("news" to it)
         }
 
         with(newsListView.timeline_list) {
