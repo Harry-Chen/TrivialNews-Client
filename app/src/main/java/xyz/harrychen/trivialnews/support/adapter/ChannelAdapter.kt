@@ -18,10 +18,18 @@ import xyz.harrychen.trivialnews.models.CategoryExpandable
 import xyz.harrychen.trivialnews.models.Channel
 
 class ChannelAdapter(
-        private var categories: List<CategoryExpandable>,
+        categories: List<CategoryExpandable>,
         private var channelSummaryOnClickHandler: (Channel) -> Unit
 ) : CheckableChildRecyclerViewAdapter<ChannelAdapter.CategoryViewHolder,
         ChannelAdapter.ChannelViewHolder>(categories), AnkoLogger {
+
+    private var subscription: List<Int> = listOf()
+
+    fun setSubscription(state: List<Int>) {
+        warn { "New subscription: $state" }
+        subscription = state
+        notifyDataSetChanged()
+    }
 
     override fun onBindCheckChildViewHolder(holder: ChannelViewHolder?, flatPosition: Int,
                                             group: CheckedExpandableGroup?, childIndex: Int) {
@@ -96,6 +104,7 @@ class ChannelAdapter(
                 channel_item_summary.setOnClickListener {
                     channelSummaryOnClickHandler(channel)
                 }
+                channel_item_text.isChecked = channel.id in subscription
             }
         }
 

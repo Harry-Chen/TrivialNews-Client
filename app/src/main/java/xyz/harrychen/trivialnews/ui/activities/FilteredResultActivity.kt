@@ -6,7 +6,6 @@ import kotlinx.android.synthetic.main.activity_search_result.*
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import xyz.harrychen.trivialnews.R
-import xyz.harrychen.trivialnews.support.api.BaseApi
 import xyz.harrychen.trivialnews.ui.fragments.timeline.BaseTimelineFragment
 import xyz.harrychen.trivialnews.ui.fragments.timeline.RangeTimelineFragment
 import xyz.harrychen.trivialnews.ui.fragments.timeline.SearchResultFragment

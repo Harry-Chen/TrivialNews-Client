@@ -15,7 +15,10 @@ class ChannelLookup{
         }
 
         fun getChannelName(id: Int): Pair<String, String> {
-            return channelNameMap[id]!!
+            return when (channelNameMap[id]) {
+                null -> "" to ""
+                else -> channelNameMap[id]!!
+            }
         }
 
     }
