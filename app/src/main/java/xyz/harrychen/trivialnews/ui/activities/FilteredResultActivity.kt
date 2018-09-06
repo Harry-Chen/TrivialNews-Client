@@ -10,6 +10,7 @@ import xyz.harrychen.trivialnews.support.api.BaseApi
 import xyz.harrychen.trivialnews.ui.fragments.timeline.BaseTimelineFragment
 import xyz.harrychen.trivialnews.ui.fragments.timeline.RangeTimelineFragment
 import xyz.harrychen.trivialnews.ui.fragments.timeline.SearchResultFragment
+import xyz.harrychen.trivialnews.ui.fragments.timeline.SingleChannelFragment
 
 
 class FilteredResultActivity : AppCompatActivity() {
@@ -49,6 +50,15 @@ class FilteredResultActivity : AppCompatActivity() {
                     bundle.putString("beforeDate", realBeforeDate.toString())
                     bundle.putString("afterDate", afterDate.toString())
                     fragment = RangeTimelineFragment()
+                }
+                "channel" -> {
+                    val name = this["name"] as String
+                    val id = this["id"] as Int
+
+                    title = getString(R.string.channel_detail_title).format(name)
+
+                    bundle.putInt("id", id)
+                    fragment = SingleChannelFragment()
                 }
             }
         }

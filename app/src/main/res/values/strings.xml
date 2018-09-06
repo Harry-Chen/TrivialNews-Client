@@ -51,4 +51,6 @@
     <string name="drawer_logout">退出登录</string>
     <string name="login_fetch_channel_failed">获取频道列表失败</string>
     <string name="login_fetch_channel_success">获取频道列表成功</string>
+    <string name="channel_detail_title">频道详情：%s</string>
+    <string name="click_channel_summary_hint">点击频道描述可查看内容</string>
 </resources>

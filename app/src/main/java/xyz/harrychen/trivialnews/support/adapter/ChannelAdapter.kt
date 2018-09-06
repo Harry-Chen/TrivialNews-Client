@@ -10,15 +10,18 @@ import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
 import kotlinx.android.synthetic.main.channel_list_category.view.*
 import kotlinx.android.synthetic.main.channel_list_item.view.*
+import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.layoutInflater
+import org.jetbrains.anko.warn
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.CategoryExpandable
 import xyz.harrychen.trivialnews.models.Channel
 
 class ChannelAdapter(
-        private var categories: List<CategoryExpandable>
+        private var categories: List<CategoryExpandable>,
+        private var channelSummaryOnClickHandler: (Channel) -> Unit
 ) : CheckableChildRecyclerViewAdapter<ChannelAdapter.CategoryViewHolder,
-        ChannelAdapter.ChannelViewHolder>(categories) {
+        ChannelAdapter.ChannelViewHolder>(categories), AnkoLogger {
 
     override fun onBindCheckChildViewHolder(holder: ChannelViewHolder?, flatPosition: Int,
                                             group: CheckedExpandableGroup?, childIndex: Int) {
@@ -90,6 +93,9 @@ class ChannelAdapter(
             with (itemView) {
                 channel_item_text.text = channel.name
                 channel_item_summary.text = channel.description
+                channel_item_summary.setOnClickListener {
+                    channelSummaryOnClickHandler(channel)
+                }
             }
         }
 

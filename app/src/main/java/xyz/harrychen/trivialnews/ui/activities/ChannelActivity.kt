@@ -5,7 +5,9 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_channel.*
+import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.uiThread
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.Category
@@ -29,6 +31,7 @@ class ChannelActivity : AppCompatActivity() {
         loadChannels()
 
         setTitle(R.string.drawer_manage_subscription)
+        snackbar(channel_coordinator, R.string.click_channel_summary_hint)
 
     }
 
@@ -43,10 +46,18 @@ class ChannelActivity : AppCompatActivity() {
                 }
 
                 uiThread {
-                    channelAdapter = ChannelAdapter(categories!!)
+                    channelAdapter = ChannelAdapter(categories!!) {
+                        startActivity<FilteredResultActivity>("type" to "channel",
+                                "name" to it.name, "id" to it.id)
+                    }
+
                     with (channel_list) {
                         layoutManager = LinearLayoutManager(this.context)
                         adapter = channelAdapter
+                    }
+
+                    channelAdapter.setChildClickListener { v, checked, group, childIndex ->
+
                     }
                 }
             }
