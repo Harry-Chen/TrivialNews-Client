@@ -50,12 +50,17 @@ class ChannelActivity : AppCompatActivity() {
             adapter = channelAdapter
         }
 
+        doAsync {
+            var subscription: List<Int>? = null
+            Realm.getInstance(RealmHelper.CONFIG_USER).use {
+                subscription = it.copyFromRealm(it.where(User::class.java).findFirst()!!).subscription
+            }
 
-        var subscription: List<Int>? = null
-        with (Realm.getInstance(RealmHelper.CONFIG_USER)) {
-            subscription = copyFromRealm(where(User::class.java).findFirst()!!).subscription
+            uiThread {
+                channelAdapter.setSubscription(subscription!!)
+            }
+
         }
-        channelAdapter.setSubscription(subscription!!)
 
 
         channelAdapter.setChildClickListener { _, checked, group, childIndex ->
@@ -70,17 +75,17 @@ class ChannelActivity : AppCompatActivity() {
 
                     var nowSubscription: List<Int>? = null
 
-                    with(Realm.getInstance(RealmHelper.CONFIG_USER)) {
-                        beginTransaction()
-                        val user = where(User::class.java).findFirst()!!
+                    Realm.getInstance(RealmHelper.CONFIG_USER).use {
+                        it.beginTransaction()
+                        val user = it.where(User::class.java).findFirst()!!
                         val userSubscription = user.subscription
                         when (checked) {
                             true -> if (channelId !in userSubscription)
                                 userSubscription.add(channelId)
                             false -> userSubscription.remove(channelId)
                         }
-                        nowSubscription = copyFromRealm(user).subscription
-                        commitTransaction()
+                        nowSubscription = it.copyFromRealm(user).subscription
+                        it.commitTransaction()
                     }
 
                     uiThread {
@@ -102,8 +107,8 @@ class ChannelActivity : AppCompatActivity() {
             var categories: List<CategoryExpandable>? = null
 
             doAsync {
-                with (Realm.getInstance(RealmHelper.CONFIG_CHANNELS)) {
-                    categories = copyFromRealm(where(Category::class.java).findAll())
+                Realm.getInstance(RealmHelper.CONFIG_CHANNELS).use {
+                    categories = it.copyFromRealm(it.where(Category::class.java).findAll())
                             .map { c -> CategoryExpandable(c) }
                 }
 

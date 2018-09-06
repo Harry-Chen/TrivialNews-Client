@@ -54,8 +54,8 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
 
     private val currentUser by lazy {
-        with(Realm.getInstance(RealmHelper.CONFIG_USER)) {
-            copyToRealm(where(User::class.java).equalTo("id", 0 as Int).findFirst()!!)
+        Realm.getInstance(RealmHelper.CONFIG_USER).use {
+            it.copyToRealm(it.where(User::class.java).equalTo("id", 0 as Int).findFirst()!!)
         }
     }
 
@@ -131,15 +131,15 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
                         doAsync {
                             var news: News? = null
 
-                            with(Realm.getInstance(RealmHelper.CONFIG_NEWS_TIMELINE)) {
-                                news = copyFromRealm(this.where(News::class.java)
+                            Realm.getInstance(RealmHelper.CONFIG_NEWS_TIMELINE).use {
+                                news = it.copyFromRealm(it.where(News::class.java)
                                         .equalTo("id", id).findFirst()!!)
                             }
 
-                            with (Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVORITE)) {
-                                beginTransaction()
-                                insertOrUpdate(news!!)
-                                commitTransaction()
+                            Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVORITE).use {
+                                it.beginTransaction()
+                                it.insertOrUpdate(news!!)
+                                it.commitTransaction()
                             }
                         }
                     }, {
@@ -152,11 +152,11 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
                     UserApi.deleteFavoriteNews(listOf(id)).subscribe({
                         snackbar(detail_coordinator, R.string.delete_favorite_success)
                         doAsync {
-                            with (Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVORITE)) {
-                                beginTransaction()
-                                where(News::class.java).equalTo("id", id)
+                            Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVORITE).use {
+                                it.beginTransaction()
+                                it.where(News::class.java).equalTo("id", id)
                                         .findAll().deleteAllFromRealm()
-                                commitTransaction()
+                                it.commitTransaction()
                             }
                         }
                     },{
@@ -196,16 +196,18 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         supportFragmentManager.beginTransaction()
                 .replace(R.id.detail_web_fragment, webFragment).commit()
 
+        snackbar(detail_coordinator, R.string.external_website_warning)
+
     }
 
 
     private fun markCachedNewsAsRead() {
         doAsync {
-            with (Realm.getInstance(RealmHelper.CONFIG_NEWS_TIMELINE)) {
-                beginTransaction()
-                where(News::class.java).equalTo("id", id)
+            Realm.getInstance(RealmHelper.CONFIG_NEWS_TIMELINE).use {
+                it.beginTransaction()
+                it.where(News::class.java).equalTo("id", id)
                         .findFirst()!!.hasRead = true
-                commitTransaction()
+                it.commitTransaction()
             }
         }
     }

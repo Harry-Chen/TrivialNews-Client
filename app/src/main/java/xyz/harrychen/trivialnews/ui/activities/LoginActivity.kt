@@ -37,8 +37,8 @@ class LoginActivity: AppCompatActivity() {
     private fun checkToken() {
 
         var user: User?
-        with (Realm.getInstance(RealmHelper.CONFIG_USER)) {
-            user = this.where(User::class.java).equalTo("id", 0 as Int).findFirst()
+        Realm.getInstance(RealmHelper.CONFIG_USER).use {
+            user = it.where(User::class.java).equalTo("id", 0 as Int).findFirst()
             if (user != null) {
                 toast(R.string.auto_logged_in)
                 setTokenAndStartMain(user!!.token)
@@ -91,13 +91,15 @@ class LoginActivity: AppCompatActivity() {
 
 
     private fun fetchChannels() {
-        ChannelApi.getChannelList().subscribe({
+        ChannelApi.getChannelList().subscribe({ categories ->
 
-            with (Realm.getInstance(RealmHelper.CONFIG_CHANNELS)) {
-                beginTransaction()
-                deleteAll()
-                copyToRealm(it)
-                commitTransaction()
+            doAsync {
+                Realm.getInstance(RealmHelper.CONFIG_CHANNELS).use {
+                    it.beginTransaction()
+                    it.deleteAll()
+                    it.copyToRealm(categories)
+                    it.commitTransaction()
+                }
             }
 
             toast(R.string.login_fetch_channel_success)
@@ -108,8 +110,8 @@ class LoginActivity: AppCompatActivity() {
 
 
     private fun initChannelList() {
-        with (Realm.getInstance(RealmHelper.CONFIG_CHANNELS)) {
-            ChannelLookup.updateChannelInfo(where(Category::class.java).findAll())
+        Realm.getInstance(RealmHelper.CONFIG_CHANNELS).use {
+            ChannelLookup.updateChannelInfo(it.where(Category::class.java).findAll())
         }
     }
 
@@ -118,10 +120,10 @@ class LoginActivity: AppCompatActivity() {
         UserApi.loginOrRegister(parameter).subscribe({user ->
 
             doAsync {
-                with (Realm.getInstance(RealmHelper.CONFIG_USER)) {
-                    beginTransaction()
-                    copyToRealm(user)
-                    commitTransaction()
+                Realm.getInstance(RealmHelper.CONFIG_USER).use {
+                    it.beginTransaction()
+                    it.copyToRealm(user)
+                    it.commitTransaction()
                 }
             }
 
