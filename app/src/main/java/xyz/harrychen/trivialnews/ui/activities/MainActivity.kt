@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         main_drawer_navigation.setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.drawer_manage_subscription -> {
-
+                    startActivity<ChannelActivity>()
                 }
                 R.id.drawer_logout -> {
                     RealmHelper.cleanUserData()
@@ -164,6 +164,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
                 today.year, today.monthOfYear - 1, today.dayOfMonth)
         dialog.setStartTitle(getString(R.string.date_begin))
         dialog.setEndTitle(getString(R.string.date_end))
+        dialog.vibrate(false)
         @Suppress("DEPRECATION")
         dialog.show(fragmentManager, "DateRangePicker")
     }

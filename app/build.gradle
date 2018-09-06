@@ -85,6 +85,8 @@ dependencies {
         exclude group: 'com.android.support'
     }
 
+    implementation 'com.thoughtbot:expandablecheckrecyclerview:1.4'
+
     kapt 'com.github.bumptech.glide:compiler:4.7.1'
     kapt "android.arch.lifecycle:compiler:$lifecycle_version"
 

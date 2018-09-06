@@ -36,6 +36,9 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.activities.ChannelActivity"
+            android:theme="@style/AppTheme.WithActionBar"/>
+
     </application>
 
 </manifest>
