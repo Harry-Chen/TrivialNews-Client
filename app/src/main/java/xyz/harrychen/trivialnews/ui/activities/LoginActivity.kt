@@ -43,7 +43,7 @@ class LoginActivity: AppCompatActivity() {
             Realm.getInstance(RealmHelper.CONFIG_USER).use {
                 user = it.where(User::class.java).equalTo("id", 0 as Int).findFirst()
                 if (user != null) {
-                    user = it.copyFromRealm(user)
+                    user = it.copyFromRealm(user!!)
                 }
             }
 
