@@ -62,7 +62,8 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
     private val currentUser by lazy {
         Realm.getInstance(RealmHelper.CONFIG_USER).use {
-            it.copyToRealm(it.where(User::class.java).equalTo("id", 0 as Int).findFirst()!!)
+            it.copyFromRealm(it.where(User::class.java)
+                    .equalTo("id", 0 as Int).findFirst()!!)
         }
     }
 
@@ -86,7 +87,6 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
         setupSlidePanel()
         setupPostComment()
-        loadNewsPage()
         loadNewsDetails()
 
     }
@@ -294,6 +294,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
                     setOnSwipeHandler()
                     markCachedNewsAsRead()
                     setShareIntent()
+                    loadNewsPage()
                 }, {
                     snackbar(detail_coordinator, R.string.detail_load_failed)
                 })

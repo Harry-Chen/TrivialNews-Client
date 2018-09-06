@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
+import org.jetbrains.anko.uiThread
 import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.Category
 import xyz.harrychen.trivialnews.models.QueryParameter
@@ -36,14 +37,23 @@ class LoginActivity: AppCompatActivity() {
 
     private fun checkToken() {
 
-        var user: User?
-        Realm.getInstance(RealmHelper.CONFIG_USER).use {
-            user = it.where(User::class.java).equalTo("id", 0 as Int).findFirst()
-            if (user != null) {
-                toast(R.string.auto_logged_in)
-                setTokenAndStartMain(user!!.token)
-            } else {
-                fetchChannels()
+        doAsync {
+
+            var user: User? = null
+            Realm.getInstance(RealmHelper.CONFIG_USER).use {
+                user = it.where(User::class.java).equalTo("id", 0 as Int).findFirst()
+                if (user != null) {
+                    user = it.copyFromRealm(user)
+                }
+            }
+
+            uiThread {
+                if (user != null) {
+                    toast(R.string.auto_logged_in)
+                    setTokenAndStartMain(user!!.token)
+                } else {
+                    fetchChannels()
+                }
             }
         }
     }

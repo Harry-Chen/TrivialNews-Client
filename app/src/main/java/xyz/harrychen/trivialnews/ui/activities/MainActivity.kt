@@ -3,6 +3,7 @@ package xyz.harrychen.trivialnews.ui.activities
 import android.arch.lifecycle.Lifecycle
 import android.os.Bundle
 import android.support.design.internal.BottomNavigationItemView
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
@@ -43,7 +44,6 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         }
 
         findViewById<BottomNavigationItemView>(R.id.navigation_timeline).callOnClick()
-
     }
 
 
@@ -162,6 +162,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         val today = LocalDate.now()
         val dialog = DatePickerDialog.newInstance(DatePickerDialog.OnDateSetListener(filterDateRange),
                 today.year, today.monthOfYear - 1, today.dayOfMonth)
+        dialog.accentColor = ContextCompat.getColor(this, R.color.accent_material_dark)
         dialog.setStartTitle(getString(R.string.date_begin))
         dialog.setEndTitle(getString(R.string.date_end))
         dialog.vibrate(false)
