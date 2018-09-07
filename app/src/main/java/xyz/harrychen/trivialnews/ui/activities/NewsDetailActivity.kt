@@ -39,6 +39,7 @@ import xyz.harrychen.trivialnews.support.adapter.CommentAdapter
 import xyz.harrychen.trivialnews.support.api.CommentApi
 import xyz.harrychen.trivialnews.support.api.NewsApi
 import xyz.harrychen.trivialnews.support.api.UserApi
+import xyz.harrychen.trivialnews.support.utils.NetworkUtils
 import xyz.harrychen.trivialnews.support.utils.RealmHelper
 import xyz.harrychen.trivialnews.support.utils.SwipeToDeleteCallback
 import xyz.harrychen.trivialnews.support.utils.toReadableDateTimeString
@@ -125,7 +126,8 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
             shareIntent.putExtra("Kdescription", shareContent)
 
 
-            when (newsToShow.picture.isNotBlank()) {
+            when (NetworkUtils.isConnected(this@NewsDetailActivity)
+                    && newsToShow.picture.isNotBlank()) {
                 false -> shareIntent.type = "text/plain"
                 true -> {
                     shareIntent.type = "image/jpg,text/plain"
@@ -258,7 +260,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
     }
 
 
-    private fun loadNewsPage() {
+    private fun loadNewsPage(showSnack: Boolean) {
 
         val webFragment = WebViewFragment()
         val bundle = Bundle()
@@ -268,7 +270,9 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         supportFragmentManager.beginTransaction()
                 .replace(R.id.detail_web_fragment, webFragment).commit()
 
-        snackbar(detail_coordinator, R.string.external_website_warning)
+        if (showSnack) {
+            snackbar(detail_coordinator, R.string.external_website_warning)
+        }
 
     }
 
@@ -294,9 +298,12 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
                     setOnSwipeHandler()
                     markCachedNewsAsRead()
                     setShareIntent()
-                    loadNewsPage()
+                    loadNewsPage(true)
                 }, {
                     snackbar(detail_coordinator, R.string.detail_load_failed)
+                    loadComments(listOf())
+                    setShareIntent()
+                    loadNewsPage(false)
                 })
     }
 

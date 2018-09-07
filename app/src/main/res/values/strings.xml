@@ -45,7 +45,7 @@
     <string name="comment_delete_failed">删除评论失败</string>
     <string name="comment_add_success">添加评论成功</string>
     <string name="comment_add_failed">添加评论失败</string>
-    <string name="detail_load_failed">加载新闻详情失败</string>
+    <string name="detail_load_failed">加载新闻详情失败，尝试在离线状态下打开网页</string>
     <string name="detail_intent_activity_not_found">找不到打开链接的应用</string>
     <string name="drawer_manage_subscription">管理频道订阅</string>
     <string name="drawer_logout">退出登录</string>

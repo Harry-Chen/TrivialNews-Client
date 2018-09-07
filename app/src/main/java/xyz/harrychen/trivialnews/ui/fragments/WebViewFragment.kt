@@ -5,7 +5,9 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebSettings
 import android.webkit.WebView
+import xyz.harrychen.trivialnews.support.utils.NetworkUtils
 import xyz.harrychen.trivialnews.support.utils.NewsWebViewClient
 
 
@@ -27,11 +29,20 @@ class WebViewFragment : Fragment() {
             loadUrl(url)
 
             with (settings) {
+
+                cacheMode = when (NetworkUtils.isConnected(context!!)) {
+                    true -> WebSettings.LOAD_DEFAULT
+                    false -> WebSettings.LOAD_CACHE_ONLY
+                }
+
+                setAppCacheEnabled(true)
+                allowContentAccess = true
+                allowFileAccess = true
+                databaseEnabled = true
                 domStorageEnabled = true
                 javaScriptEnabled = true
                 builtInZoomControls = true
                 displayZoomControls = false
-                // setInitialScale(200)
             }
 
            webViewClient = NewsWebViewClient()
