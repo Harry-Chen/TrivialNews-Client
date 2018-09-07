@@ -42,7 +42,7 @@ class RealmHelper{
             RealmConfiguration.Builder()
                     .name("news_timeline.realm")
                     .modules(NewsModel())
-                    .schemaVersion(2)
+                    .schemaVersion(3)
                     .deleteRealmIfMigrationNeeded()
                     .build()
         }
@@ -51,7 +51,7 @@ class RealmHelper{
             RealmConfiguration.Builder()
                     .name("news_favorite.realm")
                     .modules(NewsModel())
-                    .schemaVersion(2)
+                    .schemaVersion(3)
                     .deleteRealmIfMigrationNeeded()
                     .build()
         }

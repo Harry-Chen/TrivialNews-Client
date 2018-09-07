@@ -36,6 +36,7 @@ import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.models.User
 import xyz.harrychen.trivialnews.support.BAIKE_URI_PREFIX
 import xyz.harrychen.trivialnews.support.adapter.CommentAdapter
+import xyz.harrychen.trivialnews.support.api.BaseApi
 import xyz.harrychen.trivialnews.support.api.CommentApi
 import xyz.harrychen.trivialnews.support.api.NewsApi
 import xyz.harrychen.trivialnews.support.api.UserApi
@@ -83,9 +84,10 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         setupToolbar()
 
         with (intent.extras!!) {
-            newsToShow = this["news"] as News
+            newsToShow = BaseApi.GSON.fromJson(this["news"] as String, News::class.java)
         }
 
+        setKeywords(newsToShow.keywords)
         setupSlidePanel()
         setupPostComment()
         loadNewsDetails()
@@ -293,7 +295,6 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         NewsApi.getNewsDetail(newsToShow.id).bindUntilEvent(this, Lifecycle.Event.ON_STOP)
                 .subscribe({
                     detail_favorite_button.setFavoriteSuppressListener(it.favorite)
-                    setKeywords(it.keywords)
                     loadComments(it.comments)
                     setOnSwipeHandler()
                     markCachedNewsAsRead()

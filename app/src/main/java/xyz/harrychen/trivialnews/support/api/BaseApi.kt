@@ -77,7 +77,7 @@ interface BaseApi {
 
         private var RETROFIT: Retrofit? = null
 
-        private val GSON by lazy {
+        val GSON by lazy {
             GsonBuilder()
                     .setExclusionStrategies(object : ExclusionStrategy {
                         override fun shouldSkipClass(clazz: Class<*>?): Boolean {

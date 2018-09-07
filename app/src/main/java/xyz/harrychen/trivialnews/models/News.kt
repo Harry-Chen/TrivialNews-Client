@@ -1,6 +1,7 @@
 package xyz.harrychen.trivialnews.models
 
 import com.google.gson.annotations.SerializedName
+import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import java.io.Serializable
@@ -21,10 +22,11 @@ open class News(
         @SerializedName("read_num")
         var readNum: Int = 0,
         var author: String = "",
+        var keywords: RealmList<String> = RealmList(),
         @SerializedName("pubdate")
         var publishDate: Date = Date(),
         var link: String = "",
         var picture: String = "",
         @SerializedName("has_read")
         var hasRead: Boolean = false
-) : RealmObject(), Serializable
+) : RealmObject()

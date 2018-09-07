@@ -28,6 +28,7 @@ import xyz.harrychen.trivialnews.R
 import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.support.NEWS_PER_PAGE
 import xyz.harrychen.trivialnews.support.adapter.BaseTimelineAdapter
+import xyz.harrychen.trivialnews.support.api.BaseApi
 import xyz.harrychen.trivialnews.ui.activities.NewsDetailActivity
 
 abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
@@ -50,7 +51,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
                               savedInstanceState: Bundle?): View? {
         newsListView = inflater.inflate(R.layout.refreshable_timeline, container, false)
         timelineAdapter = BaseTimelineAdapter {
-            startActivity<NewsDetailActivity>("news" to it)
+            startActivity<NewsDetailActivity>("news" to BaseApi.GSON.toJson(it))
         }
 
         with(newsListView.timeline_list) {
