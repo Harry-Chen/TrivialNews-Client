@@ -3,8 +3,13 @@ package xyz.harrychen.trivialnews.ui.activities
 import android.arch.lifecycle.Lifecycle
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.support.customtabs.CustomTabsIntent
 import android.support.design.chip.Chip
 import android.support.v4.content.ContextCompat
@@ -15,9 +20,15 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.ShareActionProvider
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.util.TypedValue
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
@@ -36,14 +47,12 @@ import xyz.harrychen.trivialnews.models.News
 import xyz.harrychen.trivialnews.models.User
 import xyz.harrychen.trivialnews.support.BAIKE_URI_PREFIX
 import xyz.harrychen.trivialnews.support.adapter.CommentAdapter
+import xyz.harrychen.trivialnews.support.adapter.NewsItemViewHolder
 import xyz.harrychen.trivialnews.support.api.BaseApi
 import xyz.harrychen.trivialnews.support.api.CommentApi
 import xyz.harrychen.trivialnews.support.api.NewsApi
 import xyz.harrychen.trivialnews.support.api.UserApi
-import xyz.harrychen.trivialnews.support.utils.NetworkUtils
-import xyz.harrychen.trivialnews.support.utils.RealmHelper
-import xyz.harrychen.trivialnews.support.utils.SwipeToDeleteCallback
-import xyz.harrychen.trivialnews.support.utils.toReadableDateTimeString
+import xyz.harrychen.trivialnews.support.utils.*
 import xyz.harrychen.trivialnews.ui.fragments.WebViewFragment
 
 class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
@@ -94,7 +103,56 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
     }
 
+    private val widthMeasureSpec by lazy {
+        View.MeasureSpec.makeMeasureSpec(TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                500f,
+                resources.displayMetrics
+        ).toInt(), View.MeasureSpec.EXACTLY)
+    }
 
+    private var thumbnailGenerated = false
+    private lateinit var thumbnailPath: String
+
+    private fun drawView(view: View) {
+
+        view.measure(widthMeasureSpec, 0)
+        view.layout(0, 0, view.measuredWidth, view.measuredHeight)
+
+        val bitmap = Bitmap.createBitmap(view.measuredWidth,
+                view.measuredHeight, Bitmap.Config.ARGB_8888)
+        val background = view.background
+        Canvas(bitmap).apply {
+            background?.draw(this) ?: this.drawColor(Color.WHITE)
+            view.draw(this)
+        }
+        thumbnailPath = MediaStore.Images.Media.insertImage(this@NewsDetailActivity.contentResolver,
+                bitmap, newsToShow.title, newsToShow.summary)
+        thumbnailGenerated = true
+    }
+
+    private fun generateThumbNail() {
+
+        val view = LayoutInflater.from(this).inflate(R.layout.news_list_item, null)
+        val holder = NewsItemViewHolder(view)
+        view.measure(widthMeasureSpec, 0)
+        view.layout(0, 0, view.measuredWidth, view.measuredHeight)
+        if (newsToShow.picture.isNotBlank()) {
+            holder.bind(newsToShow, object : RequestListener<Drawable> {
+                override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                    return false
+                }
+
+                override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                    doAsync { drawView(view) }
+                    return false
+                }
+            }, true)
+        } else {
+            holder.bind(newsToShow, null, true)
+            doAsync { drawView(view) }
+        }
+    }
 
     private fun getPictureUri(url: String): Uri {
         val result = doAsyncResult {
@@ -108,6 +166,10 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
 
     private fun setShareIntent() {
+
+        if (PermissionUtils.PERMISSION_STORAGE) {
+            generateThumbNail()
+        }
 
         doAsync {
 
@@ -128,12 +190,19 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
             shareIntent.putExtra("Kdescription", shareContent)
 
 
-            when (NetworkUtils.isConnected(this@NewsDetailActivity)
-                    && newsToShow.picture.isNotBlank()) {
-                false -> shareIntent.type = "text/plain"
-                true -> {
-                    shareIntent.type = "image/jpg,text/plain"
-                    shareIntent.putExtra(Intent.EXTRA_STREAM, getPictureUri(newsToShow.picture))
+            if (PermissionUtils.PERMISSION_STORAGE) {
+                while (!thumbnailGenerated) {}
+                shareIntent.type = "image/jpg,text/plain"
+                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(thumbnailPath))
+            } else {
+                snackbar(detail_coordinator, R.string.detail_no_custom_sharing)
+                when (NetworkUtils.isConnected(this@NewsDetailActivity)
+                        && newsToShow.picture.isNotBlank()) {
+                    false -> shareIntent.type = "text/plain"
+                    true -> {
+                        shareIntent.type = "image/jpg,text/plain"
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, getPictureUri(newsToShow.picture))
+                    }
                 }
             }
 

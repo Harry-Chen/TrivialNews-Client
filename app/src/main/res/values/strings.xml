@@ -58,4 +58,6 @@
     <string name="external_website_warning">新闻详情为外部网页，分享功能的实现由外部应用确定。如没有按预期工作，敬请谅解。</string>
     <string name="detail_action_share">分享</string>
     <string name="share_format">标题：%s\n摘要：%s\n发布时间：%s\n作者：%s\n正文链接：%s\n来自 Trivial News</string>
+    <string name="detail_no_custom_sharing">没有外置存储权限，将无法生成自定义图片分享</string>
+    <string name="share_from_app">分享自 Trivial News</string>
 </resources>

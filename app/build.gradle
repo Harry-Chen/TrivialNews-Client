@@ -116,6 +116,8 @@ dependencies {
 
     implementation 'com.thoughtbot:expandablecheckrecyclerview:1.4'
 
+    implementation 'com.karumi:dexter:5.0.0'
+
     kapt 'com.github.bumptech.glide:compiler:4.7.1'
     kapt "android.arch.lifecycle:compiler:$lifecycle_version"
 

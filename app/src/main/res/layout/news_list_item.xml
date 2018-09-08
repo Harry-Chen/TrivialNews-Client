@@ -91,6 +91,17 @@
             card_view:layout_constraintTop_toBottomOf="@+id/news_item_statistics" />
 
         <TextView
+            android:id="@+id/news_item_from_app"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/NewsAttribute"
+            android:text="@string/share_from_app"
+            android:visibility="invisible"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/news_item_statistics" />
+
+        <TextView
             android:id="@+id/news_item_author"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

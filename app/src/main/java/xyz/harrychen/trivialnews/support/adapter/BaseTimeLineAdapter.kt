@@ -17,8 +17,8 @@ import xyz.harrychen.trivialnews.support.utils.toReadableDateTimeString
 
 class BaseTimelineAdapter(
     private var newsData: MutableList<News> = MutableList(0) {News()},
-    private var newsClickHandler: (news: News) -> Unit
-) : RecyclerView.Adapter<BaseTimelineAdapter.NewsItemViewHolder>() {
+    private val newsClickHandler: (news: News) -> Unit
+) : RecyclerView.Adapter<NewsItemViewHolder>() {
 
 
     fun setNews(news: Collection<News>) {
@@ -43,47 +43,17 @@ class BaseTimelineAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsItemViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        return NewsItemViewHolder(layoutInflater.inflate(
+        val holder =  NewsItemViewHolder(layoutInflater.inflate(
                 R.layout.news_list_item, parent, false))
+        holder.setNewsClickHandler(newsClickHandler)
+        return holder
     }
 
     override fun getItemCount() = newsData.size
 
     override fun onBindViewHolder(holder: NewsItemViewHolder, position: Int) =
-            holder.bind(newsData[position], position)
+            holder.bind(newsData[position])
 
 
 
-    inner class NewsItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-
-        fun bind(item: News, position: Int): Unit = with(view) {
-
-            val channelInfo = ChannelLookup.getChannelName(item.channelId)
-
-            news_item_title.text = item.title
-            news_item_summary.text = item.summary
-            news_item_channel.text = context.getString(R.string.adapter_channel)
-                    .format(channelInfo.first, channelInfo.second)
-            news_item_date.text = item.publishDate.toReadableDateTimeString()
-            news_item_author.text = context.getString(R.string.adapter_author).format(item.author)
-            news_item_statistics.text = context.getString(R.string.adapter_statistics)
-                    .format(item.readNum, item.commentNum)
-
-            news_item_shadow.visibility = if (item.hasRead) View.VISIBLE else View.INVISIBLE
-
-            when(item.picture.isBlank()) {
-                true -> {
-                    news_item_picture.visibility = View.GONE
-                    news_item_picture.layout(0, 0, 0, 0)
-                    Glide.with(this.context).clear(news_item_picture)
-                }
-                false -> {
-                    news_item_picture.visibility = View.VISIBLE
-                    Glide.with(this.context).load(item.picture).into(news_item_picture)
-                }
-            }
-
-            this.setOnClickListener { newsClickHandler(item) }
-        }
-    }
 }
