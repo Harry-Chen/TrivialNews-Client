@@ -27,7 +27,7 @@ import xyz.harrychen.trivialnews.ui.fragments.timeline.RecommendFragment
 class MainActivity : AppCompatActivity(), AnkoLogger {
 
     private var nowFragmentId = -1
-    private var fragments: HashMap<Int, BaseTimelineFragment> = HashMap()
+    private val fragments: HashMap<Int, BaseTimelineFragment> = HashMap()
     private var menu: Menu? = null
 
     private fun initNavigation() {

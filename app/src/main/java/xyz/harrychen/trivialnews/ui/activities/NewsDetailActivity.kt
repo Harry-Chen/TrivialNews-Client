@@ -37,6 +37,7 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
 import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.activity_news_detail.*
 import kotlinx.android.synthetic.main.news_detail_comment.*
+import kotlinx.android.synthetic.main.news_list_item.view.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.design.snackbar
 import xyz.harrychen.trivialnews.BuildConfig
@@ -115,6 +116,10 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         ).toInt(), View.MeasureSpec.EXACTLY)
     }
 
+    private val pixelOf100dp by lazy {
+        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100f, resources.displayMetrics)
+    }
+
 
     private val uriQueue =  LinkedBlockingQueue<Uri?>(1)
 
@@ -125,26 +130,23 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
         val picFile = File(cache, "${newsToShow.id}.png")
 
-        warn {picFile.absolutePath}
-
         if (!picFile.exists()) {
             picFile.createNewFile()
+        }
 
-            view.measure(widthMeasureSpec, 0)
-            view.layout(0, 0, view.measuredWidth, view.measuredHeight)
+        view.measure(widthMeasureSpec, 0)
+        view.layout(0, 0, view.measuredWidth, view.measuredHeight)
 
-            val bitmap = Bitmap.createBitmap(view.measuredWidth,
-                    view.measuredHeight, Bitmap.Config.ARGB_8888)
-            val background = view.background
-            Canvas(bitmap).apply {
-                background?.draw(this) ?: this.drawColor(Color.WHITE)
-                view.draw(this)
-            }
+        val bitmap = Bitmap.createBitmap(view.measuredWidth,
+                view.measuredHeight, Bitmap.Config.ARGB_8888)
+        val background = view.background
+        Canvas(bitmap).apply {
+            background?.draw(this) ?: this.drawColor(Color.WHITE)
+            view.draw(this)
+        }
 
-            picFile.outputStream().use {
-                bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
-            }
-
+        picFile.outputStream().use {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
         }
 
         uriQueue.put(FileProvider.getUriForFile(this, fileProviderAuthorityName, picFile))
@@ -154,8 +156,18 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
         val view = LayoutInflater.from(this).inflate(R.layout.news_list_item, null)
         val holder = NewsItemViewHolder(view)
+
+        val qrCodeImage = QrCodeUtils.generateQrCodeFromString(newsToShow.link, pixelOf100dp.toInt())
+
         view.measure(widthMeasureSpec, 0)
         view.layout(0, 0, view.measuredWidth, view.measuredHeight)
+
+        with (view.news_item_qrcode) {
+            visibility = View.VISIBLE
+            imageBitmap = qrCodeImage
+        }
+
+
         if (newsToShow.picture.isNotEmpty()) {
             holder.bind(newsToShow, object : RequestListener<Drawable> {
                 override fun onLoadFailed(e: GlideException?, model: Any?,
