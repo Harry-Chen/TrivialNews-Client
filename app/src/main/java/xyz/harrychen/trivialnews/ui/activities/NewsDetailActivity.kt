@@ -54,6 +54,7 @@ import xyz.harrychen.trivialnews.support.api.NewsApi
 import xyz.harrychen.trivialnews.support.api.UserApi
 import xyz.harrychen.trivialnews.support.utils.*
 import xyz.harrychen.trivialnews.ui.fragments.WebViewFragment
+import java.io.File
 
 class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
@@ -116,6 +117,7 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
     private fun drawView(view: View) {
 
+
         view.measure(widthMeasureSpec, 0)
         view.layout(0, 0, view.measuredWidth, view.measuredHeight)
 
@@ -126,18 +128,20 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
             background?.draw(this) ?: this.drawColor(Color.WHITE)
             view.draw(this)
         }
+
+
         thumbnailPath = MediaStore.Images.Media.insertImage(this@NewsDetailActivity.contentResolver,
                 bitmap, newsToShow.title, newsToShow.summary)
         thumbnailGenerated = true
     }
 
     private fun generateThumbNail() {
-
+        
         val view = LayoutInflater.from(this).inflate(R.layout.news_list_item, null)
         val holder = NewsItemViewHolder(view)
         view.measure(widthMeasureSpec, 0)
         view.layout(0, 0, view.measuredWidth, view.measuredHeight)
-        if (newsToShow.picture.isNotBlank()) {
+        if (newsToShow.picture.isNotEmpty()) {
             holder.bind(newsToShow, object : RequestListener<Drawable> {
                 override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
                     return false
