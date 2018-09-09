@@ -9,7 +9,6 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.support.customtabs.CustomTabsIntent
 import android.support.design.chip.Chip
 import android.support.v4.content.ContextCompat
@@ -55,6 +54,8 @@ import xyz.harrychen.trivialnews.support.api.UserApi
 import xyz.harrychen.trivialnews.support.utils.*
 import xyz.harrychen.trivialnews.ui.fragments.WebViewFragment
 import java.io.File
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
 
 class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
 
@@ -62,6 +63,8 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var newsToShow: News
     private lateinit var commentAdapter: CommentAdapter
     private var mShareActionProvider: ShareActionProvider? = null
+
+    private val fileProviderAuthorityName = BuildConfig.APPLICATION_ID + ".pic"
 
     private var commentsNum: Int = 0
     set(value) {
@@ -112,42 +115,56 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         ).toInt(), View.MeasureSpec.EXACTLY)
     }
 
-    private var thumbnailGenerated = false
-    private lateinit var thumbnailPath: String
+
+    private val uriQueue =  LinkedBlockingQueue<Uri?>(1)
 
     private fun drawView(view: View) {
+        val cache = File(cacheDir, "share_pic")
 
+        if (!cache.exists()) cache.mkdir()
 
-        view.measure(widthMeasureSpec, 0)
-        view.layout(0, 0, view.measuredWidth, view.measuredHeight)
+        val picFile = File(cache, "${newsToShow.id}.png")
 
-        val bitmap = Bitmap.createBitmap(view.measuredWidth,
-                view.measuredHeight, Bitmap.Config.ARGB_8888)
-        val background = view.background
-        Canvas(bitmap).apply {
-            background?.draw(this) ?: this.drawColor(Color.WHITE)
-            view.draw(this)
+        warn {picFile.absolutePath}
+
+        if (!picFile.exists()) {
+            picFile.createNewFile()
+
+            view.measure(widthMeasureSpec, 0)
+            view.layout(0, 0, view.measuredWidth, view.measuredHeight)
+
+            val bitmap = Bitmap.createBitmap(view.measuredWidth,
+                    view.measuredHeight, Bitmap.Config.ARGB_8888)
+            val background = view.background
+            Canvas(bitmap).apply {
+                background?.draw(this) ?: this.drawColor(Color.WHITE)
+                view.draw(this)
+            }
+
+            picFile.outputStream().use {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
+            }
+
         }
 
-
-        thumbnailPath = MediaStore.Images.Media.insertImage(this@NewsDetailActivity.contentResolver,
-                bitmap, newsToShow.title, newsToShow.summary)
-        thumbnailGenerated = true
+        uriQueue.put(FileProvider.getUriForFile(this, fileProviderAuthorityName, picFile))
     }
 
-    private fun generateThumbNail() {
-        
+    private fun generateThumbnail() {
+
         val view = LayoutInflater.from(this).inflate(R.layout.news_list_item, null)
         val holder = NewsItemViewHolder(view)
         view.measure(widthMeasureSpec, 0)
         view.layout(0, 0, view.measuredWidth, view.measuredHeight)
         if (newsToShow.picture.isNotEmpty()) {
             holder.bind(newsToShow, object : RequestListener<Drawable> {
-                override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
-                    return false
-                }
+                override fun onLoadFailed(e: GlideException?, model: Any?,
+                                          target: Target<Drawable>?, isFirstResource: Boolean)
+                        : Boolean { return false }
 
-                override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                override fun onResourceReady(resource: Drawable?, model: Any?,
+                                             target: Target<Drawable>?, dataSource: DataSource?,
+                                             isFirstResource: Boolean): Boolean {
                     doAsync { drawView(view) }
                     return false
                 }
@@ -158,22 +175,20 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
         }
     }
 
-    private fun getPictureUri(url: String): Uri {
-        val result = doAsyncResult {
+    private fun getNewsPictureUri(url: String): Uri {
+        val newPictureFile = doAsyncResult {
             Glide.with(this@NewsDetailActivity).downloadOnly().load(url)
                     .submit().get()
         }
 
         return FileProvider.getUriForFile(this,
-                BuildConfig.APPLICATION_ID + ".glide", result.get())
+                fileProviderAuthorityName, newPictureFile.get())
     }
 
 
     private fun setShareIntent() {
 
-        if (PermissionUtils.PERMISSION_STORAGE) {
-            generateThumbNail()
-        }
+        generateThumbnail()
 
         doAsync {
 
@@ -193,19 +208,19 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
             // WeChat < 6.6.7
             shareIntent.putExtra("Kdescription", shareContent)
 
+            val thumbnailUri = uriQueue.poll(3, TimeUnit.SECONDS)
 
-            if (PermissionUtils.PERMISSION_STORAGE) {
-                while (!thumbnailGenerated) {}
-                shareIntent.type = "image/jpg,text/plain"
-                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(thumbnailPath))
+            if (thumbnailUri != null) {
+                shareIntent.type = "image/png,text/plain"
+                shareIntent.putExtra(Intent.EXTRA_STREAM, thumbnailUri)
             } else {
                 snackbar(detail_coordinator, R.string.detail_no_custom_sharing)
                 when (NetworkUtils.isConnected(this@NewsDetailActivity)
                         && newsToShow.picture.isNotBlank()) {
                     false -> shareIntent.type = "text/plain"
                     true -> {
-                        shareIntent.type = "image/jpg,text/plain"
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, getPictureUri(newsToShow.picture))
+                        shareIntent.type = "image/png,text/plain"
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, getNewsPictureUri(newsToShow.picture))
                     }
                 }
             }

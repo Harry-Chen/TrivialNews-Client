@@ -17,7 +17,6 @@ import kotlinx.android.synthetic.main.main_content.*
 import org.jetbrains.anko.*
 import org.joda.time.LocalDate
 import xyz.harrychen.trivialnews.R
-import xyz.harrychen.trivialnews.support.utils.PermissionUtils
 import xyz.harrychen.trivialnews.support.utils.RealmHelper
 import xyz.harrychen.trivialnews.ui.fragments.timeline.BaseTimelineFragment
 import xyz.harrychen.trivialnews.ui.fragments.timeline.FavoriteFragment
@@ -113,7 +112,6 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         initDrawer()
         initFloatingActionBar()
 
-        PermissionUtils.askForPermission(this)
     }
 
 

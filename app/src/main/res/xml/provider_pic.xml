@@ -6,4 +6,8 @@
         name="glide_image_cache"
         path="image_manager_disk_cache"
         tools:path="DiskCache.Factory.DEFAULT_DISK_CACHE_DIR"/>
+
+    <cache-path
+        name="share_image_cache"
+        path="share_pic" />
 </paths>

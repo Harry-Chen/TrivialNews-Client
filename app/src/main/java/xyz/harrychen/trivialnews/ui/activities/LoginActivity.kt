@@ -22,7 +22,6 @@ import xyz.harrychen.trivialnews.support.api.BaseApi
 import xyz.harrychen.trivialnews.support.api.ChannelApi
 import xyz.harrychen.trivialnews.support.api.UserApi
 import xyz.harrychen.trivialnews.support.utils.ChannelLookup
-import xyz.harrychen.trivialnews.support.utils.PermissionUtils
 import xyz.harrychen.trivialnews.support.utils.RealmHelper
 
 class LoginActivity: AppCompatActivity() {
