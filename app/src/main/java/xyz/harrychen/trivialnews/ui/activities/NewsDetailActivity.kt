@@ -305,16 +305,10 @@ class NewsDetailActivity : AppCompatActivity(), AnkoLogger {
                     UserApi.addFavoriteNews(listOf(newsToShow.id)).subscribe({
                         snackbar(detail_coordinator, R.string.add_favorite_success)
                         doAsync {
-                            var news: News? = null
-
-                            Realm.getInstance(RealmHelper.CONFIG_NEWS_TIMELINE).use {
-                                news = it.copyFromRealm(it.where(News::class.java)
-                                        .equalTo("id", newsToShow.id).findFirst()!!)
-                            }
 
                             Realm.getInstance(RealmHelper.CONFIG_NEWS_FAVORITE).use {
                                 it.beginTransaction()
-                                it.insertOrUpdate(news!!)
+                                it.insertOrUpdate(newsToShow)
                                 it.commitTransaction()
                             }
                         }

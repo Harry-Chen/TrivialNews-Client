@@ -129,7 +129,7 @@ abstract class BaseTimelineFragment : Fragment(), AnkoLogger {
         doAsync {
             Realm.getInstance(realmConfig!!).use {
                 it.beginTransaction()
-                it.insert(newsList)
+                it.copyToRealm(newsList)
                 it.commitTransaction()
             }
         }
