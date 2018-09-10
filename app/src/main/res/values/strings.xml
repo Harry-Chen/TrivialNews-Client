@@ -60,4 +60,5 @@
     <string name="share_format">标题：%s\n摘要：%s\n发布时间：%s\n作者：%s\n正文链接：%s\n来自 Trivial News</string>
     <string name="detail_no_custom_sharing">生成自定义图片分享失败，将使用系统默认分享</string>
     <string name="share_from_app">分享自 Trivial News</string>
+    <string name="recover_from_crash">成功从崩溃中恢复</string>
 </resources>

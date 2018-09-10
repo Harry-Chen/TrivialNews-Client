@@ -28,10 +28,17 @@ class LoginActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        checkCrash()
         checkToken()
         setTitle(R.string.login_register_title)
         setContentView(R.layout.activity_login)
         initForm()
+    }
+
+    private fun checkCrash() {
+        if (intent?.extras?.get("crash") != null) {
+            toast(R.string.recover_from_crash)
+        }
     }
 
 

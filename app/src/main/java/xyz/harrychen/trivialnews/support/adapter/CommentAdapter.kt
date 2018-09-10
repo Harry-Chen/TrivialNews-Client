@@ -24,7 +24,7 @@ class CommentAdapter(
     override fun getItemCount() = comments.size
 
     override fun onBindViewHolder(holder: CommentViewHolder, position: Int) =
-            holder.bind(comments[position], position)
+            holder.bind(comments[position])
 
     fun getItem(position: Int): Comment {
         return comments[position]
@@ -42,7 +42,7 @@ class CommentAdapter(
 
 
     inner class CommentViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-        fun bind(item: Comment, position: Int): Unit = with(view) {
+        fun bind(item: Comment): Unit = with(view) {
             comment_author.text = context.getString(R.string.comment_author).format(item.username)
             comment_time.text = item.time.toReadableDateTimeString()
             comment_content.text = item.content
